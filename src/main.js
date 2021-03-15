@@ -1,10 +1,14 @@
 import "@/assets/css/init.css";
+import "@/assets/css/base.css";
 import "@/assets/css/iconfont.css";
 import root from "@/app.vue"
 import {createApp} from "vue";
+import * as Vue from "vue";
 import router from "@/router/index.js";
 import globalComponents from "@/components/index.js";
 
+
+console.log(Vue)
 // 5. 创建并挂载根实例
 const app = createApp(root);
 // 确保 _use_ 路由实例使

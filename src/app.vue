@@ -1,32 +1,33 @@
 <template>
-<div class="p-app">
+<div class="p-app" :style="{'background-image': `url(${GlobalBg})`}">
   <div class="p-app__wrapper">
     <div class="p-app__top">
       <div class="p-app__left">
-        <c-sider-bar></c-sider-bar>
+        <c-side-bar></c-side-bar>
       </div>
       <div class="p-app__right">
-        <div class="p-app__search"></div>
+        <div class="p-app__toolbar">
+          <c-search></c-search>
+        </div>
         <div class="p-app__container"></div>
       </div>
     </div>
     <div class="p-app__bottom">
-      <div class="p-app__palyer"></div>
+      <div class="p-app__player">
+        <c-player></c-player>
+      </div>
     </div>
   </div>
 </div>
 </template>
 
 <script type="text/javascript">
-import CSiderBar from "@/components/sidebar.vue";
+import GlobalBg from "@/assets/imgs/global_bg_02.jpg";
 export default {
   data() {
     return {
-
+      GlobalBg
     }
-  },
-  components: {
-    CSiderBar
   },
   created(){
   },
@@ -43,6 +44,8 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  background-size: cover;
+  color: $color-font-main;
   &__wrapper {
     width: 1010px;
     height: 630px;
@@ -67,11 +70,21 @@ export default {
     flex: 1 1 0;
     height: 100%;
     background-color: $color-bg-shallow;
+    padding: 0px 26px;
+  }
+  &__toolbar {
+    width: 100%;
+    height: 66px;
+    display: flex;
+    align-items: center;
   }
   &__bottom {
     width: 100%;
-    height: 70px;
+    height: 60px;
     background-color: #101121;
+  }
+  &__player {
+    height: 100%;
   }
 }
 </style>

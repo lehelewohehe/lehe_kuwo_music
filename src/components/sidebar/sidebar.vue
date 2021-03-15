@@ -7,9 +7,12 @@
     <div class="c-sidebar__nickname">点此登录</div>
     <div class="c-sidebar__icon"></div>
   </div>
-  <div class="c-sidebar__list" v-for="(item, index) in siderbar">
+  <div class="c-sidebar__list" v-for="(item, index) in sidebar">
     <div class="c-sidebar__title" v-if="item.title">{{item.title}}</div>
-    <div class="c-sidebar__item" :class="{active: item.active }" v-for="(item, index) in item.list">
+    <div class="c-sidebar__item" 
+    :class="{active: item.active }" 
+    v-for="(item, index) in item.list"
+    @click="selectItem(item)">
       <i class="c-sidebar__item__icon iconfont" :class="item.icon"></i>
       <div class="c-sidebar__item__name">{{item.name}}</div>
     </div>
@@ -18,10 +21,11 @@
 </template>
 
 <script type="text/javascript">
+import {getCurrentInstance} from "vue";
 export default {
   data() {
     return {
-      siderbar: [
+      sidebar: [
         {
           title: "",
           list: [
@@ -85,8 +89,25 @@ export default {
       ]
     }
   },
-  created(){
+  setup(props, context) {
+    const {ctx} = getCurrentInstance();
+    const selectItem = function(target) {
+      ctx.sidebar.forEach((item) => {
+        for(let i = 0; i < item.list.length; i++) {
+          if(item.list[i].active) {
+            item.list[i].active = false;
+            return;
+          }
+        }
+      });
+      target.active = true;
+    }
 
+    return {
+      selectItem
+    }
+  },
+  created(){
   },
   mounted() {
 
@@ -119,7 +140,6 @@ export default {
     justify-content: flex-start;
     align-items: center;
     font-size: $font-size-s;
-    color: $color-font-main;
     cursor: pointer;
     &__name {
       margin-left: 10px;

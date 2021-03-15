@@ -1,8 +1,16 @@
 // 注册全局组件
-import CAvatar from "@/components/avatar.vue";
+import CAvatar from "@/components/avatar/avatar.vue";
+import CSearch from "@/components/search/search.vue";
+import CSiderBar from "@/components/sidebar/sidebar.vue";
+import CPlayer from "@/components/player/player.vue";
+import CProgress from "@/components/progress/progress.vue";
 
 const infos = [
-  {name: "c-avatar", component: CAvatar}
+  {name: "c-avatar", component: CAvatar},
+  {name: "c-search", component: CSearch},
+  {name: "c-side-bar", component: CSiderBar},
+  {name: "c-player", component: CPlayer},
+  {name: "c-progress", component: CProgress}
 ]
 export default function(app, options) {
   infos.forEach((item) => {
