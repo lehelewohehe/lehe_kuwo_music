@@ -11,3 +11,13 @@ export const throttle = function(fn, interval) {
    }
   }
 }
+
+// 得到对象键值对拼接后的字符串
+export const reduce = (style) => {
+  return () => {
+    let arr = Object.entries(style.value);
+    return arr.reduce((total, item) => {
+      return total + `${item[0]}:${item[1]};`;
+    }, "");
+  }
+}

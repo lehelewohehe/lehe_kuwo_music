@@ -4,13 +4,15 @@ import CSearch from "@/components/search/search.vue";
 import CSiderBar from "@/components/sidebar/sidebar.vue";
 import CPlayer from "@/components/player/player.vue";
 import CProgress from "@/components/progress/progress.vue";
+import COptionBox from "@/components/option-box/option-box.vue";
 
 const infos = [
   {name: "c-avatar", component: CAvatar},
   {name: "c-search", component: CSearch},
   {name: "c-side-bar", component: CSiderBar},
   {name: "c-player", component: CPlayer},
-  {name: "c-progress", component: CProgress}
+  {name: "c-progress", component: CProgress},
+  {name: "c-option-box", component: COptionBox}
 ]
 export default function(app, options) {
   infos.forEach((item) => {

@@ -53,6 +53,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.1);
   }
   &__top {
     width: 100%;

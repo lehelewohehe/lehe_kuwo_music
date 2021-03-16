@@ -1,8 +1,10 @@
 <template>
 <div class="c-progress" :style="`transform: rotate(-${vertical ? 90 : 0}deg);`">
-  <div class="c-progress__wrapper" @mousemove="onShowTooltip" @mouseleave="() => {showTooltip = false}">
+  <div class="c-progress__wrapper" 
+  @mousemove="onShowTooltip" 
+  @mouseleave="() => {showTooltip = false}">
     <div class="c-progress__outer" 
-    :style="`${getProgressStyle};background-color: #FFF;`"
+    :style="`${getProgressStyle};`"
     @click="onSetCurrentProgress"
     ref="outer"></div>
     <div class="c-progress__inner" 
@@ -22,29 +24,26 @@
     </div>
     <div class="c-progress__tooltip"
     v-show="showTooltip"
-    :style="`transform: translate(-50%, 100%) rotate(${vertical ? 90 : 0}deg);${getTooltip};left:${tooltipLeft}px`" 
-    v-html="text">
+    :style="`transform: translate(-50%, -100%) rotate(${vertical ? 90 : 0}deg);${getTooltip};left:${tooltipLeft}px`" 
+    v-html="text || defaultText">
     </div>
   </div>
 </div>
 </template>
 
 <script type="text/javascript">
-import {toRefs, ref, computed, getCurrentInstance, watch} from "vue";
-import {throttle} from "@/utils/utils.js";
+import {toRefs, ref, computed, getCurrentInstance, watch, nextTick} from "vue";
+import {throttle, reduce} from "@/utils/utils.js";
 export default {
   props: {
-    mode: {
-      type: String,
-      default: ""
-    },
     progressStyle: {
       type: Object,
       default: () => {
         return {
           "background-color": "#ffd200",
           "height": "4px",
-          "border-radius": "2px"
+          "border-radius": "2px",
+          // "transition": "all 0.2s ease"
         };
       }
     },
@@ -67,17 +66,13 @@ export default {
       type: Number,
       default: 0
     },
-    currentValue: {
-      type: Number,
-      default: 0
-    },
     percent: {
       type: Number,
       default: 60
     },
     text: {
       type: String,
-      default: "你好"
+      default: ""
     },
     vertical: {
       type: Boolean,
@@ -102,30 +97,24 @@ export default {
     }
   },
   setup(props, context) {
-    let {circleStyle, progressStyle, percent, vertical, tooltip} = toRefs(props);
+    let {circleStyle, progressStyle, percent, vertical, tooltip, max} = toRefs(props);
     let {ctx} = getCurrentInstance();
     let tooltipLeft = ref(0);
     let showTooltip = ref(false);
+    let defaultText = ref("");
     let startX = 0;
     let startY = 0;
     let offsetWidth = 0;
-
-    // 得到对象键值对拼接后的字符串
-    let reduce = (style) => {
-      return () => {
-        let arr = Object.entries(style.value);
-        return arr.reduce((total, item) => {
-          return total + `${item[0]}:${item[1]};`;
-        }, "");
-      }
-    }
     let getCircleStyle = computed(reduce(circleStyle));
     let getProgressStyle = computed(reduce(progressStyle));
     let getTooltip = computed(reduce(tooltip));
 
     watch(percent, () => {
-      tooltipLeft.value = ctx.$refs["inner"].offsetWidth;
-    });
+      nextTick(() => {
+        tooltipLeft.value = ctx.$refs["inner"].offsetWidth;
+      });
+      defaultText.value = Math.ceil(percent.value * max.value / 100);
+    }, {immediate: true});
     // console.log(getProgressStyle.value, getCircleStyle.value);
     let onSetCurrentProgress = function(e) {
       let {offsetX} = e;
@@ -143,7 +132,7 @@ export default {
       _percent = _percent < 0 ? 0 : _percent;
       _percent = _percent > 100 ? 100 : _percent;
       ctx.$emit("update:percent", _percent);
-    }, 100);
+    }, 10);
 
     // 进度条滑动结束
     let onDrapEnd = function(e) {
@@ -161,10 +150,20 @@ export default {
       document.addEventListener("mouseup", onDrapEnd);
     }
     // 设置tooltip出现并且设置出现的位置 节流包装
-    let onShowTooltip = throttle(function({offsetX}) {
+    let onShowTooltip = throttle(function(e) {
+      let _offsetWidth = ctx.$refs["outer"].offsetWidth;
       showTooltip.value = true;
-      tooltipLeft.value = offsetX;
-    }, 100);
+      // 判断触发事件的目标元素是否是c-progress__circle
+      // 是则改变tooltip位置的计算方式
+      if(e.target.className == "c-progress__circle") {
+        tooltipLeft.value = e.target.offsetLeft + e.target.offsetWidth;
+      } else {
+        tooltipLeft.value = e.offsetX;
+      }
+      tooltipLeft.value = tooltipLeft.value < 0 ? 0 : tooltipLeft.value;
+      tooltipLeft.value = tooltipLeft.value < _offsetWidth ? tooltipLeft.value : _offsetWidth;
+      defaultText.value = Math.floor(tooltipLeft.value / _offsetWidth * max.value);
+    }, 10);
 
     return {
       getCircleStyle,
@@ -174,7 +173,8 @@ export default {
       onDrapInit,
       tooltipLeft,
       onShowTooltip,
-      showTooltip
+      showTooltip,
+      defaultText
     }
   },
   mounted() {
@@ -190,20 +190,18 @@ export default {
     width: 100%;
     position: relative;
   }
-  &__outer,
-  &__inner {
-    width: 100%;
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    cursor: pointer;
-  }
   &__outer {
+    width: 100%;
+    cursor: pointer;
+    background-color: $color-font-white !important;
     box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.1);
   }
   &__inner {
+    position: absolute;
+    left: 0px;
+    top: 0px;
     width: 80%;
-    transition: all 0.2s ease;
+    cursor: pointer;
   }
   &__circle {
     position: absolute;
@@ -213,18 +211,18 @@ export default {
     box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.1);
   }
   &__tooltip {
-    width: 50px;
+    width: 30px;
     height: 30px;
     border-radius: 5px;
     box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.1);
     text-align: center;
     line-height: 30px;
     font-size: $font-size-xs;
-    background-color: #FFF;
+    background-color: $color-font-white;
     position: absolute;
-    bottom: -20px;
+    top: -10px;
     left: 0px;
-    transform: translate(-50%, 100%);
+    transform: translate(-50%, -100%);
     transform-origin: center;
   }
 }
