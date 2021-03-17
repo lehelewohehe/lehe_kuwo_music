@@ -87,7 +87,7 @@ export default {
   },
   emits: {
     "update:percent": paload => {
-      console.log(paload, 111);
+      console.log(paload, "update:percent");
       return true;
     }
   },
@@ -99,6 +99,7 @@ export default {
   setup(props, context) {
     let {circleStyle, progressStyle, percent, vertical, tooltip, max} = toRefs(props);
     let {ctx} = getCurrentInstance();
+    // tooltip的左方向相对位置偏移量
     let tooltipLeft = ref(0);
     let showTooltip = ref(false);
     let defaultText = ref("");
@@ -108,14 +109,16 @@ export default {
     let getCircleStyle = computed(reduce(circleStyle));
     let getProgressStyle = computed(reduce(progressStyle));
     let getTooltip = computed(reduce(tooltip));
-
+    // 监听percent，同步其他数据变化
     watch(percent, () => {
       nextTick(() => {
         tooltipLeft.value = ctx.$refs["inner"].offsetWidth;
       });
       defaultText.value = Math.ceil(percent.value * max.value / 100);
     }, {immediate: true});
+
     // console.log(getProgressStyle.value, getCircleStyle.value);
+    // 直接跳转到指定进度位置
     let onSetCurrentProgress = function(e) {
       let {offsetX} = e;
       // console.log(e, ctx.$refs["outer"].offsetWidth, offsetX);

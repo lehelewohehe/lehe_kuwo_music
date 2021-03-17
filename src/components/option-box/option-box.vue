@@ -4,11 +4,11 @@
     <div class="c-option-box__item" 
     v-for="(item, index) in options.list" :key="item.text"
     :style="`${getItemStyle}`"
-    :class="{active: options.currentMode == index}"
+    :class="{active: options.currentIndex == index}"
     @click="onSetCurrentOptions(index)">
       <slot name="icon" :icon="item.icon"></slot>
       <div class="c-option-box__text flex-center">{{item.text}}</div>
-      <slot name="status" :status="item.status"></slot>
+      <slot name="status" :status="item.status" :index="index"></slot>
     </div>
   </div>
 </div>
@@ -72,6 +72,8 @@ export default {
     flex: 1 1 0;
     font-size: $font-size-s;
     color: $color-font-black;
+    word-break:keep-all;     /* 不换行 */
+    white-space:nowrap;      /* 不换行 */
   }
 }
 </style>

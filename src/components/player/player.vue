@@ -24,7 +24,23 @@
             <div class="c-player__singer-info__all">3:40</div>
           </div>
           <div class="c-player__singer-info__quality" @click="onChangeQuality">
-            <span>高品</span><i class="iconfont iconshang"></i>
+            <span>{{quality.list[quality.currentIndex].text.substr(0, 2)}}</span>
+            <i class="iconfont iconshang"></i>
+            <c-option-box class="c-player__singer-info__box" 
+            v-show="quality.isQuality"
+            @onSetCurrentOptions="(index) => {quality.currentIndex=index}"
+            :options="quality" :itemStyle="{width: `200px`,height: `40px`}">
+              <template #icon="{icon}">
+                <div class="c-player__singer-info__icon flex-center">
+                  <i :class="`iconfont ${icon}`"></i>
+                </div>
+              </template>
+              <template #status="{status, index}">
+                <div class="c-player__singer-info__status flex-center">
+                  <i :class="`iconfont ${quality.currentIndex == index ? 'iconduigou' : ''}`"></i>
+                </div>
+              </template>
+            </c-option-box>
           </div>
         </div>
       </div>
@@ -38,8 +54,8 @@
       <span>1.0 X</span>
     </div>
     <div class="c-player__mode flex-center" @click="onChangeMode">
-      <i class="iconfont iconxunhuanbofang"></i>
-      <c-option-box @onSetCurrentOptions="(index) => {mode.currentMode=index}" 
+      <i :class="`iconfont ${mode.list[mode.currentIndex].icon}`"></i>
+      <c-option-box @onSetCurrentOptions="(index) => {mode.currentIndex=index}" 
         v-show="mode.isMode" class="c-player__mode__box" :options="mode">
         <template #icon="{icon}">
           <div class="c-player__mode__icon flex-center">
@@ -87,43 +103,62 @@ import {ref, getCurrentInstance, toRefs, toRef, nextTick} from "vue";
 export default {
   data() {
     return {
-      mode: {
-        list: [
-          {icon: "icondanqubofang", text: "单曲播放", status: ""},
-          {icon: "icondanquxunhuan", text: "单曲循环", status: ""},
-          {icon: "iconzu4163", text: "顺序播放", status: ""},
-          {icon: "iconxunhuanbofang", text: "循环播放", status: ""},
-          {icon: "iconsuijibofang", text: "随机播放", status: ""}
-        ],
-        currentMode: 0,
-        isMode: false
-      }
-    }
+    } 
   },
   setup(props, context) {
     let avatar = ref(avatarImg);
-    let signerPercent = ref(0);
-    let voicePercent = ref(0);
     let isCollect = ref(false);
-    let isQuality = ref(false);
-    let instance = getCurrentInstance();
-    let mode;
+    // 歌曲播放进度条百分比
+    let signerPercent = ref(0);
+    // 声音控制进度条百分比
+    let voicePercent = ref(0);
+    let {ctx} = getCurrentInstance();
+    
 
-    nextTick(() => {
-      mode = instance.proxy.mode;
+    // 歌曲播放模式数据管理对象
+    let mode = ref({
+      list: [
+        {icon: "icondanqubofang", text: "单曲播放", status: ""},
+        {icon: "icondanquxunhuan", text: "单曲循环", status: ""},
+        {icon: "iconzu4163", text: "顺序播放", status: ""},
+        {icon: "iconxunhuanbofang", text: "循环播放", status: ""},
+        {icon: "iconsuijibofang", text: "随机播放", status: ""}
+      ],
+      currentIndex: 0,
+      isMode: false
     });
 
+    // 歌曲质量切换数据管理对象
+    let quality = ref({
+      list: [
+        {icon: "icondanqubofang", text: "无损音质", status: ""},
+        {icon: "", text: "超品音质-320K", status: ""},
+        {icon: "", text: "高品音质-128K", status: ""},
+        {icon: "", text: "流畅音质-WMA", status: ""},
+      ],
+      currentIndex: 0,
+      isQuality: false
+    });
+
+    // 用于本地切换歌曲是否被收藏状态
     let onChangeCollect = function() {
       isCollect.value = !isCollect.value;
+      if(isCollect.value) {
+        ctx.$toast({
+          message: "成功加入歌曲至'我的收藏'!",
+          icon: "iconzhuyi"
+        })
+      }
     }
 
+    // 切换模式选项盒子
     let onChangeMode = function() {
-      console.log(mode);
-      mode.isMode = !mode.isMode;
+      mode.value.isMode = !mode.value.isMode;
     }
 
+    // 切换歌曲质量选项盒子
     let onChangeQuality = function() {
-      isQuality.value = !isQuality.value;
+      quality.value.isQuality = !quality.value.isQuality;
     }
 
     return {
@@ -131,14 +166,14 @@ export default {
       signerPercent,
       voicePercent,
       isCollect,
-      isQuality,
       onChangeCollect,
       onChangeMode,
-      onChangeQuality
+      mode,
+      onChangeQuality,
+      quality
     }
   },
   mounted() {
-    console.log(this, 888)
   }
 }
 </script>
@@ -160,6 +195,7 @@ export default {
     box-sizing: border-box;
     .iconfont {
       font-size: 30px;
+      cursor: pointer;
     }
   }
   &__switch {
@@ -202,12 +238,30 @@ export default {
       margin-right: 18px;
     }
     &__quality {
+      position: relative;
+      user-select: none;
       margin-right: 4px;
       cursor: pointer;
       transition: color 0.5s ease;
       &:hover {
         color: white;
       }
+      .iconfont {
+        font-size: $font-size-l;
+      }
+    }
+    &__icon,
+    &__status {
+      width: 30px;
+      height: 40px;
+      color: $color-font-black;
+    }
+    /deep/ .c-player__singer-info__box {
+      position: absolute;
+      left: 0px;
+      top: -18px;
+      transform: translate(-50%, -100%);
+      background-color: #FFF;
     }
   }
   &__relevant {
@@ -280,6 +334,7 @@ export default {
       color: $color-font-black;
     }
     /deep/ .c-player__mode__box {
+      background-color: #FFF;
       position: absolute;
       left: 0px;
       top: 0px;
