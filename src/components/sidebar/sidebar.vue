@@ -1,6 +1,6 @@
 <template>
 <div class="c-sidebar">
-  <div class="c-sidebar__login">
+  <div class="c-sidebar__login" @click="$login">
     <div class="c-sidebar__avatar">
       <c-avatar size="36px"></c-avatar>
     </div>
@@ -22,6 +22,7 @@
 
 <script type="text/javascript">
 import {getCurrentInstance} from "vue";
+import {doLoginByCellPhone} from "@/request/index.js";
 export default {
   data() {
     return {
@@ -108,6 +109,14 @@ export default {
     }
   },
   created(){
+    // doLoginByCellPhone({
+    //   data: {
+    //     phone: "13437249059",
+    //     password: "zq351590006"
+    //   }
+    // }).then((data) => {
+    //   console.log(data, 123);
+    // });
   },
   mounted() {
 

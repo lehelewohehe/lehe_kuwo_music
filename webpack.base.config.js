@@ -7,6 +7,7 @@ const { VueLoaderPlugin } = require('vue-loader');
 
 module.exports = {
   entry: "./src/main.js",
+  devtool: "source-map",
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name]-[hash].js",
@@ -69,7 +70,7 @@ module.exports = {
       // 指定使用一个 host。默认是 localhost
       host: 'localhost',
       // 端口号
-      port: 3000,
+      port: 8080,
       // 当使用 HTML5 History API 时，任意的 404 响应都可能需要被替代为 index.html。通过设置为 true 进行启用
       historyApiFallback: {
         disableDotRule: true

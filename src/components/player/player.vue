@@ -99,12 +99,8 @@
 
 <script type="text/javascript">
 import avatarImg from "@/assets/imgs/global_bg_01.jpg";
-import {ref, getCurrentInstance, toRefs, toRef, nextTick} from "vue";
+import {ref, getCurrentInstance} from "vue";
 export default {
-  data() {
-    return {
-    } 
-  },
   setup(props, context) {
     let avatar = ref(avatarImg);
     let isCollect = ref(false);
@@ -172,8 +168,6 @@ export default {
       onChangeQuality,
       quality
     }
-  },
-  mounted() {
   }
 }
 </script>
@@ -184,6 +178,7 @@ export default {
   height: 100%;
   height: 100%;
   color: $color-font-gray;
+  user-select: none;
   &__control {
     width: 200px;
     height: 100%;
