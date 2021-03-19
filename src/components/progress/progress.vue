@@ -98,7 +98,7 @@ export default {
   },
   setup(props, context) {
     let {circleStyle, progressStyle, percent, vertical, tooltip, max} = toRefs(props);
-    let {ctx} = getCurrentInstance();
+    let {emit} = context;
     // tooltip的左方向相对位置偏移量
     let tooltipLeft = ref(0);
     let showTooltip = ref(false);
@@ -106,13 +106,18 @@ export default {
     let startX = 0;
     let startY = 0;
     let offsetWidth = 0;
+    // 定义ref值
+    let inner = ref(null);
+    let outer = ref(null);
+
+    // 计算属性
     let getCircleStyle = computed(reduce(circleStyle));
     let getProgressStyle = computed(reduce(progressStyle));
     let getTooltip = computed(reduce(tooltip));
     // 监听percent，同步其他数据变化
     watch(percent, () => {
       nextTick(() => {
-        tooltipLeft.value = ctx.$refs["inner"].offsetWidth;
+        tooltipLeft.value = inner.value.offsetWidth;
       });
       defaultText.value = Math.ceil(percent.value * max.value / 100);
     }, {immediate: true});
@@ -121,9 +126,9 @@ export default {
     // 直接跳转到指定进度位置
     let onSetCurrentProgress = function(e) {
       let {offsetX} = e;
-      // console.log(e, ctx.$refs["outer"].offsetWidth, offsetX);
-      // console.log(Number((offsetX / ctx.$refs["outer"].offsetWidth * 100).toFixed(2)));
-      ctx.$emit("update:percent", Number((offsetX / ctx.$refs["outer"].offsetWidth * 100).toFixed(2)));
+      // console.log(e, outer.value.offsetWidth, offsetX);
+      // console.log(Number((offsetX / outer.value.offsetWidth * 100).toFixed(2)));
+      emit("update:percent", Number((offsetX / outer.value.offsetWidth * 100).toFixed(2)));
     }
     
     // 进度条滑动 节流包装
@@ -131,10 +136,10 @@ export default {
       // console.log(e, "move");
       let diff = vertical.value ? startY - pageY : pageX - startX ;
       console.log(pageX, startX);
-      let _percent = Number(((offsetWidth + diff) / ctx.$refs["outer"].offsetWidth * 100).toFixed(2));
+      let _percent = Number(((offsetWidth + diff) / outer.value.offsetWidth * 100).toFixed(2));
       _percent = _percent < 0 ? 0 : _percent;
       _percent = _percent > 100 ? 100 : _percent;
-      ctx.$emit("update:percent", _percent);
+      emit("update:percent", _percent);
     }, 10);
 
     // 进度条滑动结束
@@ -146,7 +151,7 @@ export default {
 
     // 进度条滑动初始化
     let onDrapInit = function({pageX, pageY}) {
-      offsetWidth = ctx.$refs["inner"].offsetWidth;
+      offsetWidth = inner.value.offsetWidth;
       startX = pageX;
       startY = pageY;
       document.addEventListener("mousemove", onDrapMove);
@@ -154,7 +159,7 @@ export default {
     }
     // 设置tooltip出现并且设置出现的位置 节流包装
     let onShowTooltip = throttle(function(e) {
-      let _offsetWidth = ctx.$refs["outer"].offsetWidth;
+      let _offsetWidth = outer.value.offsetWidth;
       showTooltip.value = true;
       // 判断触发事件的目标元素是否是c-progress__circle
       // 是则改变tooltip位置的计算方式
@@ -177,7 +182,9 @@ export default {
       tooltipLeft,
       onShowTooltip,
       showTooltip,
-      defaultText
+      defaultText,
+      inner,
+      outer
     }
   },
   mounted() {

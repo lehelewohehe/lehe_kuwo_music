@@ -49,8 +49,6 @@ export default {
       background-color: $color-bg-deep;
       font-size: $font-size-s;
       color: $color-font-gray;
-      outline: none;
-      border: none;
       width: 100%;
     }
   }

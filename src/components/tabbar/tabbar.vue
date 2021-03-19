@@ -5,8 +5,8 @@
     :class="{active: item.active}"
     v-for="(item, index) in list" 
     :key="item.name + index" 
-    :style="`getTextStyle ${item.active && getActiveStyle}`"
-    @click="onSetCurrentIndex">
+    :style="`${getTextStyle} ${item.active && getActiveStyle}`"
+    @click="onSetCurrentIndex(index)">
       {{item.name}}
     </div>
   </div>
@@ -49,17 +49,37 @@ export default {
       default: "0px"
     }
   },
+  emits: {
+    "onSetCurrentIndex": paload => {
+      console.log(paload, "onSetCurrentIndex");
+      return true;
+    }
+  },
   setup(props, context) {
     let {textStyle, activeStyle} = toRefs(props);
     let getTextStyle = computed(reduce(textStyle));
     let getActiveStyle = computed(reduce(activeStyle));
     let {emit} = context;
-    let onSetCurrentIndex = function() {
-      emit("onSetCurrentIndex", index);
+
+    let setCurrentIndex = function(index) {
+      return (list) => {
+        list.some((item) => {
+          if(item.active) {
+            item.active = false;
+            return true;
+          }
+        });
+        list[index].active = true;
+      }
     }
+    let onSetCurrentIndex = function(index) {
+      emit("onSetCurrentIndex", setCurrentIndex(index));
+    }
+
     return {
       getTextStyle,
-      getActiveStyle
+      getActiveStyle,
+      onSetCurrentIndex
     }
   }
 }
@@ -71,17 +91,19 @@ export default {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    box-sizing: border-box;
   }
   &__item {
     position: relative;
+    cursor: pointer;
     &.active {
       &::after {
         content: "";
-        width: 20px;
-        height: 6px;
+        width: 24px;
+        height: 4px;
         background-color: $color-main;
         position: absolute;
-        left: 0px;
+        left: 50%;
         bottom: 0px;
         transform: translateX(-50%);
       }

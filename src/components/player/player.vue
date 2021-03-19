@@ -99,7 +99,8 @@
 
 <script type="text/javascript">
 import avatarImg from "@/assets/imgs/global_bg_01.jpg";
-import {ref, getCurrentInstance} from "vue";
+import {toast} from "@/components/hook.js";
+import {ref} from "vue";
 export default {
   setup(props, context) {
     let avatar = ref(avatarImg);
@@ -108,8 +109,6 @@ export default {
     let signerPercent = ref(0);
     // 声音控制进度条百分比
     let voicePercent = ref(0);
-    let {ctx} = getCurrentInstance();
-    
 
     // 歌曲播放模式数据管理对象
     let mode = ref({
@@ -140,7 +139,7 @@ export default {
     let onChangeCollect = function() {
       isCollect.value = !isCollect.value;
       if(isCollect.value) {
-        ctx.$toast({
+        toast({
           message: "成功加入歌曲至'我的收藏'!",
           icon: "iconzhuyi"
         })
@@ -178,7 +177,6 @@ export default {
   height: 100%;
   height: 100%;
   color: $color-font-gray;
-  user-select: none;
   &__control {
     width: 200px;
     height: 100%;
@@ -234,7 +232,6 @@ export default {
     }
     &__quality {
       position: relative;
-      user-select: none;
       margin-right: 4px;
       cursor: pointer;
       transition: color 0.5s ease;
@@ -251,7 +248,7 @@ export default {
       height: 40px;
       color: $color-font-black;
     }
-    /deep/ .c-player__singer-info__box {
+    :deep() .c-player__singer-info__box {
       position: absolute;
       left: 0px;
       top: -18px;
@@ -296,7 +293,7 @@ export default {
       transform-origin: center;
       transform: translate(-50%, -100%);
     }
-    /deep/ .c-player__voice-control__progress {
+    :deep() .c-player__voice-control__progress {
       width: 100px;
       position: absolute;
       bottom: 14px;
@@ -328,7 +325,7 @@ export default {
       height: 40px;
       color: $color-font-black;
     }
-    /deep/ .c-player__mode__box {
+    :deep() .c-player__mode__box {
       background-color: #FFF;
       position: absolute;
       left: 0px;

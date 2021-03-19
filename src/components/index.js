@@ -6,6 +6,8 @@ import CPlayer from "@/components/player/player.vue";
 import CProgress from "@/components/progress/progress.vue";
 import COptionBox from "@/components/option-box/option-box.vue";
 import CTabBar from "@/components/tabbar/tabbar.vue";
+import CInput from "@/components/input/input.vue";
+import CRadio from "@/components/radio/radio.vue";
 
 const infos = [
   {name: "c-avatar", component: CAvatar},
@@ -14,7 +16,9 @@ const infos = [
   {name: "c-player", component: CPlayer},
   {name: "c-progress", component: CProgress},
   {name: "c-option-box", component: COptionBox},
-  {name: "c-tab-bar", component: CTabBar}
+  {name: "c-tab-bar", component: CTabBar},
+  {name: "c-input", component: CInput},
+  {name: "c-radio", component: CRadio}
 ]
 export default function(app, options) {
   infos.forEach((item) => {

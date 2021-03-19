@@ -15,7 +15,7 @@ export const throttle = function(fn, interval) {
 // 得到对象键值对拼接后的字符串
 export const reduce = (style) => {
   return () => {
-    let arr = Object.entries(style.value);
+    let arr = Object.entries(style.value || style);
     return arr.reduce((total, item) => {
       return total + `${item[0]}:${item[1]};`;
     }, "");

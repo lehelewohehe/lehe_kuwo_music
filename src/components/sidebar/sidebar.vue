@@ -1,6 +1,6 @@
 <template>
 <div class="c-sidebar">
-  <div class="c-sidebar__login" @click="$login">
+  <div class="c-sidebar__login" @click="createLoginCmp()">
     <div class="c-sidebar__avatar">
       <c-avatar size="36px"></c-avatar>
     </div>
@@ -21,79 +21,75 @@
 </template>
 
 <script type="text/javascript">
-import {getCurrentInstance} from "vue";
+import {ref} from "vue";
 import {doLoginByCellPhone} from "@/request/index.js";
+import {createLoginCmp} from "@/components/hook.js";
 export default {
-  data() {
-    return {
-      sidebar: [
-        {
-          title: "",
-          list: [
-            {
-              icon: "icontuijian",
-              name: "推荐",
-              active: true
-            },
-            {
-              icon: "iconluyinjishouyinjidiantai",
-              name: "电台",
-              active: false
-            },
-            {
-              icon: "iconshipin",
-              name: "视频",
-              active: false
-            },
-            {
-              icon: "iconguankanzhibo",
-              name: "直播",
-              active: false
-            },
-          ]
-        },
-        {
-          title: "我的音乐",
-          list: [
-            {
-              icon: "icondiantai",
-              name: "我的电台",
-              active: false
-            },
-            {
-              icon: "iconxiazai",
-              name: "下载管理",
-              active: false
-            },
-            {
-              icon: "icondiannaopcxianshiqi",
-              name: "本地音乐",
-              active: false
-            },
-            {
-              icon: "iconlishijilu",
-              name: "最近播放",
-              active: false
-            }
-          ]
-        },
-        {
-          title: "自建音乐",
-          list: [
-            {
-              icon: "icongedan",
-              name: "默认列表",
-              active: false
-            }
-          ]
-        }
-      ]
-    }
-  },
   setup(props, context) {
-    const {ctx} = getCurrentInstance();
+    let sidebar = ref([
+      {
+        title: "",
+        list: [
+          {
+            icon: "icontuijian",
+            name: "推荐",
+            active: true
+          },
+          {
+            icon: "iconluyinjishouyinjidiantai",
+            name: "电台",
+            active: false
+          },
+          {
+            icon: "iconshipin",
+            name: "视频",
+            active: false
+          },
+          {
+            icon: "iconguankanzhibo",
+            name: "直播",
+            active: false
+          },
+        ]
+      },
+      {
+        title: "我的音乐",
+        list: [
+          {
+            icon: "icondiantai",
+            name: "我的电台",
+            active: false
+          },
+          {
+            icon: "iconxiazai",
+            name: "下载管理",
+            active: false
+          },
+          {
+            icon: "icondiannaopcxianshiqi",
+            name: "本地音乐",
+            active: false
+          },
+          {
+            icon: "iconlishijilu",
+            name: "最近播放",
+            active: false
+          }
+        ]
+      },
+      {
+        title: "自建音乐",
+        list: [
+          {
+            icon: "icongedan",
+            name: "默认列表",
+            active: false
+          }
+        ]
+      }
+    ]);
     const selectItem = function(target) {
-      ctx.sidebar.forEach((item) => {
+      sidebar.value.forEach((item) => {
         for(let i = 0; i < item.list.length; i++) {
           if(item.list[i].active) {
             item.list[i].active = false;
@@ -105,7 +101,9 @@ export default {
     }
 
     return {
-      selectItem
+      selectItem,
+      createLoginCmp,
+      sidebar
     }
   },
   created(){
