@@ -2,7 +2,7 @@
 <div class="c-input">
   <div class="c-input__wrapper" :style="`background-color: ${bgColor};`">
     <slot name="icon">
-      <div class="c-input__icon flex-center">
+      <div class="c-input__icon flex-center" v-if="icon">
         <i :class="`iconfont ${icon}`"></i>
       </div>
     </slot>

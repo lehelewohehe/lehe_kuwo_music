@@ -1,6 +1,6 @@
 <template>
-<div class="c-login postion-center" v-show="visible">
-  <div class="c-login__close flex-center" @click="createLoginCmp(true)">
+<div class="c-login position-center" v-show="visible">
+  <div class="c-login__close flex-center" @click="createLoginWindow(true)">
     <i class="iconfont iconguanbi"></i>
   </div>
   <div class="c-login__qrcode">
@@ -41,7 +41,9 @@
       </div>
     </div>
     <div class="c-login__submit flex-center">登录</div>
-    <div class="c-login__register">没有账号，立即注册 <i class="iconfont iconyou"></i></div>
+    <div class="c-login__register" 
+    @click="() => {createLoginWindow(true);createRegisterWindow();}">
+    没有账号，立即注册 <i class="iconfont iconyou"></i></div>
     <div class="c-login__other">
       <i class="iconfont iconqq"></i>
       <i class="iconfont iconweibo"></i>
@@ -60,7 +62,7 @@
 import CTabBar from "@/components/tabbar/tabbar.vue";
 import CInput from "@/components/input/input.vue";
 import CRadio from "@/components/radio/radio.vue";
-import {createLoginCmp} from "@/components/hook.js";
+import {createLoginWindow, createRegisterWindow} from "@/components/hook.js";
 import {ref, nextTick} from "vue";
 export default {
   props: {
@@ -92,7 +94,8 @@ export default {
     return {
       tabbar,
       form,
-      createLoginCmp
+      createLoginWindow,
+      createRegisterWindow
     }
   }
 }

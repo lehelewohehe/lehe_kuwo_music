@@ -1,6 +1,6 @@
 <template>
 <div class="c-sidebar">
-  <div class="c-sidebar__login" @click="createLoginCmp()">
+  <div class="c-sidebar__login" @click="createLoginWindow()">
     <div class="c-sidebar__avatar">
       <c-avatar size="36px"></c-avatar>
     </div>
@@ -23,7 +23,7 @@
 <script type="text/javascript">
 import {ref} from "vue";
 import {doLoginByCellPhone} from "@/request/index.js";
-import {createLoginCmp} from "@/components/hook.js";
+import {createLoginWindow} from "@/components/hook.js";
 export default {
   setup(props, context) {
     let sidebar = ref([
@@ -102,7 +102,7 @@ export default {
 
     return {
       selectItem,
-      createLoginCmp,
+      createLoginWindow,
       sidebar
     }
   },

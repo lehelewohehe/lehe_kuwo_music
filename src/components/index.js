@@ -8,6 +8,7 @@ import COptionBox from "@/components/option-box/option-box.vue";
 import CTabBar from "@/components/tabbar/tabbar.vue";
 import CInput from "@/components/input/input.vue";
 import CRadio from "@/components/radio/radio.vue";
+import CInputTitle from "@/components/input-title/input-title.vue";
 
 const infos = [
   {name: "c-avatar", component: CAvatar},
@@ -18,7 +19,8 @@ const infos = [
   {name: "c-option-box", component: COptionBox},
   {name: "c-tab-bar", component: CTabBar},
   {name: "c-input", component: CInput},
-  {name: "c-radio", component: CRadio}
+  {name: "c-radio", component: CRadio},
+  {name: "c-input-title", component: CInputTitle}
 ]
 export default function(app, options) {
   infos.forEach((item) => {
