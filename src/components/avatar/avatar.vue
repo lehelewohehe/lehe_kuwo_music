@@ -2,12 +2,13 @@
 <div class="c-avatar" :style="{width: size, height: size}">
   <div class="c-avatar__wrapper" 
   style="background-size: cover" 
-  :style="{'background-image': `url(${src ? src : unloginAvatar})`}">
+  :style="{'background-image': `url(${src ? src : avatar})`}">
   </div>
 </div>
 </template>
 
 <script type="text/javascript">
+import {ref} from "vue";
 import unloginAvatar from "@/assets/imgs/unlogin_avatar.jpg";
 export default {
   props: {
@@ -20,16 +21,12 @@ export default {
       default: ""
     }
   },
-  data() {
+  setup(props, context) {
+    let avatar = ref(unloginAvatar);
+
     return {
-      unloginAvatar
+      avatar
     }
-  },
-  created(){
-
-  },
-  mounted() {
-
   }
 }
 </script>

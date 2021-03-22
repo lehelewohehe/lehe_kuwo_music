@@ -109,7 +109,6 @@ export default {
     let signerPercent = ref(0);
     // 声音控制进度条百分比
     let voicePercent = ref(0);
-
     // 歌曲播放模式数据管理对象
     let mode = ref({
       list: [
@@ -122,7 +121,6 @@ export default {
       currentIndex: 0,
       isMode: false
     });
-
     // 歌曲质量切换数据管理对象
     let quality = ref({
       list: [
@@ -145,12 +143,10 @@ export default {
         })
       }
     }
-
     // 切换模式选项盒子
     let onChangeMode = function() {
       mode.value.isMode = !mode.value.isMode;
     }
-
     // 切换歌曲质量选项盒子
     let onChangeQuality = function() {
       quality.value.isQuality = !quality.value.isQuality;

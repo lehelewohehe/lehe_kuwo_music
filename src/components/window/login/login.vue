@@ -30,11 +30,10 @@
           <c-input icon="iconshouji" v-model:value="form.phoneNum"></c-input>
         </div>
         <div class="c-login__phone__code">
-          <c-input icon="iconsuo" type="password" v-model:value="form.phoneCode">
+          <c-input icon="iconsuo" type="password" 
+          v-model:value="form.phoneCode">
             <template #button>
-              <div class="c-login__phone__btn flex-center">
-                {{"获取验证码"}}
-              </div>
+              <countdown-btn v-model:state="form.state"></countdown-btn>
             </template>
           </c-input>
         </div>
@@ -62,8 +61,9 @@
 import CTabBar from "@/components/tabbar/tabbar.vue";
 import CInput from "@/components/input/input.vue";
 import CRadio from "@/components/radio/radio.vue";
+import CountdownBtn from "@/components/countdown-btn/countdown-btn.vue";
 import {createLoginWindow, createRegisterWindow} from "@/components/hook.js";
-import {ref, nextTick} from "vue";
+import {ref, nextTick, watch} from "vue";
 export default {
   props: {
     visible: {
@@ -74,14 +74,15 @@ export default {
   components: {
     CTabBar,
     CInput,
-    CRadio
+    CRadio,
+    CountdownBtn
   },
   setup(props, context) {
-    console.log(props);
     let tabbar = ref([
       {name: "账号登录", active: true},
       {name: "手机号登录", active: false}
     ]);
+    // 表单相关的数据
     let form = ref({
       acountNum: "",
       accountPwd: "",
@@ -89,8 +90,20 @@ export default {
       phoneCode: "",
       isAgree: false,
       isRemmenber: false,
-      isAuto: false
+      isAuto: false,
+      state: "notready"
     });
+
+    // 监听电话号码，实时改变倒计时组件的状态
+    watch(() => form.value.phoneNum, (next, pre) => {
+      let reg = /^1(?:3\d|4[4-9]|5[0-35-9]|6[67]|7[013-8]|8\d|9\d)\d{8}$/;
+      if(reg.test(next)) {
+        form.value.state = "ready";
+      } else {
+        form.value.state = "notready";
+      }
+    });
+    
     return {
       tabbar,
       form,
@@ -151,17 +164,6 @@ export default {
     margin: 36px 0px 40px;
   }
   &__phone {
-    &__btn {
-      width: 120px;
-      background-color: $color-bg-deep;
-      color: $color-font-gray;
-      font-size: $font-size-s;
-      &.active {
-        background-color: $color-main;
-        color: $color-font-black;
-        cursor: pointer;
-      }
-    }
     &__code {
       margin-top: 14px;
     }

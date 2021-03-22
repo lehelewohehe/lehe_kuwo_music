@@ -3,6 +3,8 @@ import CLogin from "@/components/window/login/login.vue";
 import CRegister from "@/components/window/register/register.vue";
 import {createApp, reactive, ref, toRefs} from "vue";
 
+
+// 动态创建轻提示组件
 export let toast = (function() {
   let _app = null;
   let container = null;
@@ -21,7 +23,7 @@ export let toast = (function() {
   }
 })();
 
-
+// 动态创建/关闭登录弹窗的组件
 export let createLoginWindow = (function() {
   let _app = null;
   let _obj = {visible: true};
@@ -39,7 +41,7 @@ export let createLoginWindow = (function() {
   }
 })();
 
-
+// 动态创建/关闭注册弹窗的组件
 export let createRegisterWindow = (function() {
   let _app = null;
   let _obj = {visible: true};

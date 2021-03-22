@@ -91,11 +91,6 @@ export default {
       return true;
     }
   },
-  data() {
-    return {
-
-    }
-  },
   setup(props, context) {
     let {circleStyle, progressStyle, percent, vertical, tooltip, max} = toRefs(props);
     let {emit} = context;
@@ -186,9 +181,6 @@ export default {
       inner,
       outer
     }
-  },
-  mounted() {
-
   }
 }
 </script>

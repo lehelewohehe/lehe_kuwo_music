@@ -115,9 +115,6 @@ export default {
     // }).then((data) => {
     //   console.log(data, 123);
     // });
-  },
-  mounted() {
-
   }
 }
 </script>

@@ -31,6 +31,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: $color-font-main;
   &__name {
     font-size: $font-size-s;
   }
