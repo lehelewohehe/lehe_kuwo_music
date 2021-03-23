@@ -2,6 +2,7 @@ import CToast from "@/components/toast/toast.vue";
 import CLogin from "@/components/window/login/login.vue";
 import CRegister from "@/components/window/register/register.vue";
 import {createApp, reactive, ref, toRefs} from "vue";
+import store from "@/store/index.js";
 
 
 // 动态创建轻提示组件
@@ -37,6 +38,7 @@ export let createLoginWindow = (function() {
     container = document.createElement("div");
     document.body.appendChild(container);
     _app = createApp(CLogin, _obj);
+    _app.use(store);
     _app.mount(container);
   }
 })();
@@ -55,6 +57,7 @@ export let createRegisterWindow = (function() {
     container = document.createElement("div");
     document.body.appendChild(container);
     _app = createApp(CRegister, _obj);
+    _app.use(store);
     _app.mount(container);
   }
 })();

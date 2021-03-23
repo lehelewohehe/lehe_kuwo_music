@@ -1,5 +1,5 @@
 <template>
-<div class="c-register position-center" v-show="visible">
+<div class="c-register fixed-center" v-show="visible">
   <div class="c-register__close flex-center" @click="createRegisterWindow(true)">
     <i class="iconfont iconguanbi"></i>
   </div>

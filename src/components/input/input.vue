@@ -7,7 +7,7 @@
       </div>
     </slot>
     <div class="c-input__input">
-      <input :type="type" @input="onInput"
+      <input :type="type" @input="onInput" :value="value"
       v-bind="$attrs"
       :style="`background-color: ${bgColor};${getInputStyle};`"
       :placeholder="placeholder">

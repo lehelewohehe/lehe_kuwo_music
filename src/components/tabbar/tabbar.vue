@@ -50,30 +50,30 @@ export default {
     }
   },
   emits: {
-    "onSetCurrentIndex": paload => {
-      console.log(paload, "onSetCurrentIndex");
+    "update:list": payload => {
+      console.log(payload, "update:list");
       return true;
     }
   },
   setup(props, context) {
-    let {textStyle, activeStyle} = toRefs(props);
+    let {textStyle, activeStyle, list} = toRefs(props);
     let getTextStyle = computed(reduce(textStyle));
     let getActiveStyle = computed(reduce(activeStyle));
     let {emit} = context;
 
-    let setCurrentIndex = function(index) {
-      return (list) => {
-        list.some((item) => {
-          if(item.active) {
-            item.active = false;
-            return true;
-          }
-        });
-        list[index].active = true;
-      }
+    let setCurrentIndex = function(list, index) {
+      list.some((item) => {
+        if(item.active) {
+          item.active = false;
+          return true;
+        }
+      });
+      list[index].active = true;
     }
     let onSetCurrentIndex = function(index) {
-      emit("onSetCurrentIndex", setCurrentIndex(index));
+      let _list = JSON.parse(JSON.stringify(list.value));
+      setCurrentIndex(_list, index)
+      emit("update:list", _list);
     }
 
     return {

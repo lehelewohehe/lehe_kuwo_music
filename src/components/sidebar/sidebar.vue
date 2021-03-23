@@ -105,16 +105,6 @@ export default {
       createLoginWindow,
       sidebar
     }
-  },
-  created(){
-    // doLoginByCellPhone({
-    //   data: {
-    //     phone: "13437249059",
-    //     password: "zq351590006"
-    //   }
-    // }).then((data) => {
-    //   console.log(data, 123);
-    // });
   }
 }
 </script>

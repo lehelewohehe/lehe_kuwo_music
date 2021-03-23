@@ -140,7 +140,7 @@ export default {
         toast({
           message: "成功加入歌曲至'我的收藏'!",
           icon: "iconzhuyi"
-        })
+        });
       }
     }
     // 切换模式选项盒子
