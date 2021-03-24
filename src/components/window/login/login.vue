@@ -60,10 +60,13 @@
     </div>
     <div class="c-login__qrcode-page__title flex-center">手机扫码登录</div>
     <div class="c-login__qrcode-page__tip flex-center">使用<a href="http://www.kuwo.cn/down">酷我音乐App</a>扫描二维码</div>
-    <div class="c-login__qrcode-page__wrapper">
-      <div class="c-login__qrcode-page__guide-img"></div>
+    <div class="c-login__qrcode-page__wrapper" :class="{active: !qr.timeout}">
+      <div class="c-login__qrcode-page__guide-img flex-center">我其实是一张图片，用于引导你如何操作，但是条件有限，凑合着看吧</div>
       <div class="c-login__qrcode-page__qrcode absolute-center">
-        <img src="" alt="">
+        <img :src="qr.base64" alt="">
+        <div class="c-login__qrcode-page__mask flex-center" v-show="qr.timeout">
+          <div class="c-login__qrcode-page__btn flex-center">二维码已过期</div>
+        </div>
       </div>
     </div>
     <div class="c-login__qrcode-page__guide-text flex-center">
@@ -82,10 +85,11 @@ import CInput from "@/components/input/input.vue";
 import CRadio from "@/components/radio/radio.vue";
 import CountdownBtn from "@/components/countdown-btn/countdown-btn.vue";
 import {createLoginWindow, createRegisterWindow, toast} from "@/components/hook.js";
-import {doLoginByCellPhone} from "@/request/index.js";
+import {doLoginByCellPhone, getQrLoginKey, getQRLoginBase64, checkQrLoginStatus} from "@/request/index.js";
 import {ref, nextTick, watch, computed} from "vue";
 import {useStore} from "vuex";
 import {myLocal} from "@/utils/storage.js";
+import defaultQrcode from "../../../assets/imgs/default_qrcode.png";
 export default {
   props: {
     visible: {
@@ -105,7 +109,6 @@ export default {
       {name: "账号登录", active: true},
       {name: "手机号登录", active: false}
     ]);
-    console.log(accountInfo, 123);
     // 表单相关的数据
     let form = ref({
       acountNum: accountInfo.phone || "",
@@ -120,7 +123,10 @@ export default {
     });
     // 扫码登录相关数据
     let qr = ref({
-      visible: false
+      visible: false,
+      base64: defaultQrcode,
+      timeId: null,
+      timeout: true
     });
     let store = useStore();
     let user = computed(() => {
@@ -139,6 +145,49 @@ export default {
     // 切换到扫码的方式登录
     let onQrcodeLogin = function() {
       qr.value.visible = true;
+      if(qr.value.visible) {
+        let _key = null;
+        getQrLoginKey().then(data => {
+          _key = data.data.unikey;
+          getQRLoginBase64({
+            params: {
+              key: _key,
+              qrimg: true
+            }
+          }).then(data => {
+            qr.value.base64 = data.data.qrimg;
+            qr.value.timeId = setInterval(() => {
+              checkQrLoginStatus({
+                params: {
+                  key: _key
+                }
+              }).then(data => {
+                console.log(data, 123);
+                switch(data.code) {
+                  case 800: {
+                    toast({
+                      message: "二维码已过期",
+                      icon: "iconzhuyi"
+                    });
+                    clearInterval(qr.value.timeId);
+                  } break;
+                  case 801: break;
+                  case 802: break;
+                  case 803: {
+                    toast({
+                      message: "授权登录成功",
+                      icon: "iconzhuyi"
+                    });
+                    createLoginWindow(true);
+                    clearInterval(qr.value.timeId);
+                  } break;
+                  default: "";
+                }
+              });
+            }, 1000);
+          });
+        });
+      }
     }
     // 登录
     let onLogin = function() {
@@ -175,10 +224,14 @@ export default {
             toast({
               message: data,
               icon: "iconzhuyi"
-            })
+            });
           } else {
-            console.log(data, 123);
-            store.commit("setUser", data.profile);
+            store.commit("setLoginInfo", data);
+            createLoginWindow(true);
+            toast({
+              message: "登录成功",
+              icon: "iconzhuyi"
+            });
             if(form.value.isRemmenber) {
               myLocal.set(myLocal.keys["LEHE_ACCOUNT_INFO"], {
                 phone: form.value.acountNum,
@@ -399,7 +452,7 @@ export default {
       position: relative;
       margin: 0px 10px;
       margin-top: 50px;
-      &:hover {
+      &.active:hover {
         .c-login__qrcode-page__guide-img {
           right: 0px;
           transform: translate(0, -50%);
@@ -413,8 +466,24 @@ export default {
     &__qrcode {
       height: 190px;
       width: 190px;
-      background-color: red;
       transition: all 0.5s ease;
+      position: relative;
+    }
+    &__mask {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+    &__btn {
+      padding: 5px 5px;
+      cursor: pointer;
+      font-size: $font-size-xs;
+      color: #FFF;
+      border-radius: 6px;
+      background-color: $color-main;
     }
     &__guide-img {
       position: absolute;
@@ -425,6 +494,10 @@ export default {
       height: 165px;
       background-color: $color-main;
       transition: all 0.5s ease;
+      font-size: $font-size-xs;
+      color: $color-font-main;
+      padding: 0px 10px;
+      box-sizing: border-box;
     }
     &__guide-text {
       margin-top: 55px;

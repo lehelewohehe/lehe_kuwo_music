@@ -1,7 +1,6 @@
 import axios from "axios";
 import qs from "qs";
 
-
 const instance = axios.create({
   baseURL: 'http://localhost:3000',
   timeout: 60000,
@@ -10,8 +9,9 @@ const instance = axios.create({
 
 // 异常拦截处理器
 const errorHandler = (error) => {
-  const status = get(error, 'response.status');
+  const status = error?.response?.status;
   switch (status) {
+    case 301: error.message = "需要登录"; break;
     case 400: error.message = '请求错误'; break;
     case 401: error.message = '未授权，请登录'; break;
     case 403: error.message = '拒绝访问'; break;
@@ -31,12 +31,13 @@ const errorHandler = (error) => {
 // 添加请求拦截器
 instance.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
-  let {method, params={}} = config;
+  let {method, params={}, data={}} = config;
+  params.timeStamp = Date.now();
+  config.params = params;
   if(method.toLowerCase() == "post") {
-    params.timeStamp = Date.now();
+    // let str = qs.stringify(params);
+    // config.url += `?${str}`;
   }
-  let str = qs.stringify(params);
-  config.url += `?${str}`;
   // console.log(method, config);
   return config;
 }, function (error) {
@@ -46,10 +47,10 @@ instance.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 instance.interceptors.response.use(function (response) {
+  console.log(response);
   const dataAxios = response.data;
   // 这个状态码是和后端约定的
   const { code } = dataAxios;
-  console.log(dataAxios);
   // 根据 code 进行判断
   if (code === undefined) {
     // 如果没有 code 代表这不是项目后端开发的接口
@@ -58,6 +59,10 @@ instance.interceptors.response.use(function (response) {
     // 有 code 代表这是一个后端接口 可以进行进一步的判断
     switch (code) {
       case 200:
+      case 800:
+      case 801:
+      case 802:
+      case 803:
         // [ 示例 ] code === 200 代表没有错误
         return dataAxios;
       case 400:

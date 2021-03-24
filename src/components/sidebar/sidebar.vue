@@ -1,10 +1,10 @@
 <template>
 <div class="c-sidebar">
-  <div class="c-sidebar__login" @click="createLoginWindow()">
+  <div class="c-sidebar__login" @click="onLogin">
     <div class="c-sidebar__avatar">
-      <c-avatar size="36px"></c-avatar>
+      <c-avatar size="36px" :src="profile.avatarUrl"></c-avatar>
     </div>
-    <div class="c-sidebar__nickname">点此登录</div>
+    <div class="c-sidebar__nickname">{{profile.nickname || "点击登录"}}</div>
     <div class="c-sidebar__icon"></div>
   </div>
   <div class="c-sidebar__list" v-for="(item, index) in sidebar">
@@ -12,7 +12,7 @@
     <div class="c-sidebar__item" 
     :class="{active: item.active }" 
     v-for="(item, index) in item.list"
-    @click="selectItem(item)">
+    @click="onSelectItem(item)">
       <i class="c-sidebar__item__icon iconfont" :class="item.icon"></i>
       <div class="c-sidebar__item__name">{{item.name}}</div>
     </div>
@@ -22,6 +22,7 @@
 
 <script type="text/javascript">
 import {ref} from "vue";
+import {mapState, useStore} from "vuex";
 import {doLoginByCellPhone} from "@/request/index.js";
 import {createLoginWindow} from "@/components/hook.js";
 export default {
@@ -88,7 +89,9 @@ export default {
         ]
       }
     ]);
-    const selectItem = function(target) {
+    let store = useStore();
+    // 切换当前子项
+    const onSelectItem = function(target) {
       sidebar.value.forEach((item) => {
         for(let i = 0; i < item.list.length; i++) {
           if(item.list[i].active) {
@@ -99,12 +102,26 @@ export default {
       });
       target.active = true;
     }
+    // 登录
+    let onLogin = function() {
+      let {nickname} = store.state.user.profile;
+      if(nickname) {
+
+      }else {
+        createLoginWindow()
+      }
+    }
 
     return {
-      selectItem,
-      createLoginWindow,
-      sidebar
+      onSelectItem,
+      sidebar,
+      onLogin
     }
+  },
+  computed: {
+    ...mapState({
+      profile: state => state.user.profile
+    })
   }
 }
 </script>

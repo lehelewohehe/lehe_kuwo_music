@@ -1,5 +1,5 @@
 // 所有的localstorage key
-const myLocakKeys = {
+const myLocalKeys = {
 	LEHE_ACCOUNT_INFO: "lehe_account_info"
 }
 /**
@@ -26,7 +26,7 @@ const myLocal = {
   remove(key) {
     localStorage.removeItem(key);
   },
-	keys: myLocakKeys
+	keys: myLocalKeys
 }
 /**
  * sessionStorage标准封装
@@ -54,19 +54,26 @@ const mySession = {
   }
 }
 
+// 有时间限制的本地存储的key
+let timeLocalKeys = {
+  LEHET_COOKIE: "lehet_cookie",
+  LEHET_TOKEN: "lehet_token",
+  LEHET_PROFILE: "lehet_profile"
+}
+
 /**
- * localstorage定时缓存封装，设置缓存时如果没有设置时间,单位分钟，默认60分钟
+ * localstorage定时缓存封装，设置缓存时如果没有设置时间,单位分钟，默认60 * 24 * 3分钟
  */
-const timeLocal = {
+const timeLocal = {
   //存储
   set(key, value, time) {
     try {
       if (!localStorage) {
           return null;
       }
-      //如果没有设置时间或者为NaN,则设置默认时间为24小时
+      //如果没有设置时间或者为NaN,则设置默认时间为72小时
       if (!time || isNaN(time)) {
-          time = 60;
+          time = 60 * 24 * 3;
       }
       //过期时间的毫秒数
       const endTime = (new Date()).getTime() + time * 60 * 1000;
@@ -100,7 +107,8 @@ const timeLocal = {
   // 删除数据
   remove(key) {
     localStorage.removeItem(key);
-  }
+  },
+  keys: timeLocalKeys
 }
 
 // 暴露给外部访问

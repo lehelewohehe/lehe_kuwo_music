@@ -1,5 +1,5 @@
 <template>
-<div class="p-app" :style="{'background-image': `url(${GlobalBg})`}">
+<div class="p-app" :style="{'background-image': `url(${globalBg})`}">
   <div class="p-app__wrapper">
     <div class="p-app__top">
       <div class="p-app__left">
@@ -22,17 +22,24 @@
 </template>
 
 <script type="text/javascript">
-import GlobalBg from "@/assets/imgs/global_bg_02.jpg";
+import globalBgImg from "@/assets/imgs/global_bg_02.jpg";
+import {doLoginRefresh} from "@/request/index.js";
+import {ref} from "vue";
+import {useStore} from "vuex";
+import {timeLocal} from "@/utils/storage.js";
 export default {
-  data() {
-    return {
-      GlobalBg
-    }
-  },
-  created(){
-  },
-  mounted() {
+  setup(props, context) {
+    let globalBg = ref(globalBgImg);
+    let store = useStore();
+    doLoginRefresh().catch(data => {
+      timeLocal.remove(timeLocal.keys["LEHET_COOKIE"]);
+      timeLocal.remove(timeLocal.keys["LEHET_TOKEN"]);
+      timeLocal.remove(timeLocal.keys["LEHET_PROFILE"]);
+    });
 
+    return {
+      globalBg
+    }
   }
 }
 </script>
