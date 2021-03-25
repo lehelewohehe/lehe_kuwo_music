@@ -55,12 +55,14 @@ export default {
     // 获取验证码
     let onGetCode = function() {
       if(status.value.active) {
+        status.value.active = false;
         timeId = setInterval(() => {
           countdown--;
           status.value.text = `重新获取(${countdown})`;
           if(countdown <= 0) {
             clearInterval(timeId);
             timeId = null;
+            countdown = 60;
             setStatusByState(state.value);
           }
         }, 1000);

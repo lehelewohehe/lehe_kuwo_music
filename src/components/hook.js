@@ -9,7 +9,7 @@ import store from "@/store/index.js";
 export let toast = (function() {
   let _app = null;
   let container = null;
-  return function({icon, message, delay=2000}) {
+  return function({icon="iconzhuyi", message, delay=2000}) {
     if(_app) {
       return;
     }

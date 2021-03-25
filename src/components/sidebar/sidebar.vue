@@ -6,6 +6,8 @@
     </div>
     <div class="c-sidebar__nickname">{{profile.nickname || "点击登录"}}</div>
     <div class="c-sidebar__icon"></div>
+    <c-user-box style="position: absolute;left: 10px;top: 10px;" :list="userList"
+    @click="onPersonalService" v-if="isLogin && boxVisible"></c-user-box>
   </div>
   <div class="c-sidebar__list" v-for="(item, index) in sidebar">
     <div class="c-sidebar__title" v-if="item.title">{{item.title}}</div>
@@ -22,11 +24,12 @@
 
 <script type="text/javascript">
 import {ref} from "vue";
-import {mapState, useStore} from "vuex";
-import {doLoginByCellPhone} from "@/request/index.js";
-import {createLoginWindow} from "@/components/hook.js";
+import {mapState, useStore, mapGetters} from "vuex";
+import {doLoginByCellPhone, quitLogin} from "@/request/index.js";
+import {createLoginWindow, toast} from "@/components/hook.js";
 export default {
   setup(props, context) {
+    let store = useStore();
     let sidebar = ref([
       {
         title: "",
@@ -89,7 +92,15 @@ export default {
         ]
       }
     ]);
-    let store = useStore();
+    let userList = ref([
+      {icon: "icongeren", name: "个人主页", path: ""},
+      {icon: "iconhuiyuanzhongxin", name: "会员中心", path: ""},
+      {icon: "icongedan", name: "还原歌单", path: ""},
+      {icon: "iconxiugai", name: "修改密码", path: ""},
+      {icon: "icontuichu", name: "退出登录", path: ""}
+    ]);
+    // 用于存储登录状态相关的信息
+    let boxVisible = ref(false);
     // 切换当前子项
     const onSelectItem = function(target) {
       sidebar.value.forEach((item) => {
@@ -104,24 +115,56 @@ export default {
     }
     // 登录
     let onLogin = function() {
-      let {nickname} = store.state.user.profile;
-      if(nickname) {
-
+      // 已登录
+      if(store.getters.isLogin) {
+        boxVisible.value = !boxVisible.value;
       }else {
         createLoginWindow()
+      }
+    }
+    // 用户个人业务
+    let onPersonalService = function(e) {
+      console.log(e, 88);
+      switch(e) {
+        case "icongeren": {
+
+        } break;
+        case "iconhuiyuanzhongxin": {
+
+        } break;
+        case "icongedan": {
+
+        } break;
+        case "iconxiugai": {
+
+        } break;
+        case "icontuichu": {
+          quitLogin().then(data => {
+            console.log(data, "quit");
+            toast({
+              message: "退出成功"
+            });
+            store.commit("setLoginInfo", {});
+          });
+        } break;
+        default: ;
       }
     }
 
     return {
       onSelectItem,
+      onPersonalService,
       sidebar,
-      onLogin
+      onLogin,
+      userList,
+      boxVisible
     }
   },
   computed: {
     ...mapState({
       profile: state => state.user.profile
-    })
+    }),
+    ...mapGetters(["isLogin"])
   }
 }
 </script>
@@ -130,6 +173,7 @@ export default {
   width: 100%;
   height: 100%;
   &__login {
+    position: relative;
     height: 60px;
     padding-left: 25px;
     line-height: 60px;

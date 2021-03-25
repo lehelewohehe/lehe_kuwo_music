@@ -23,7 +23,7 @@
 
 <script type="text/javascript">
 import globalBgImg from "@/assets/imgs/global_bg_02.jpg";
-import {doLoginRefresh} from "@/request/index.js";
+import {getLoginStatus} from "@/request/index.js";
 import {ref} from "vue";
 import {useStore} from "vuex";
 import {timeLocal} from "@/utils/storage.js";
@@ -31,10 +31,14 @@ export default {
   setup(props, context) {
     let globalBg = ref(globalBgImg);
     let store = useStore();
-    doLoginRefresh().catch(data => {
-      timeLocal.remove(timeLocal.keys["LEHET_COOKIE"]);
-      timeLocal.remove(timeLocal.keys["LEHET_TOKEN"]);
-      timeLocal.remove(timeLocal.keys["LEHET_PROFILE"]);
+    getLoginStatus().then(data => {
+      let {code, profile} = data.data;
+      store.commit("setProfile", {profile});
+      if(code !== 200) {
+        timeLocal.remove(timeLocal.keys["LEHET_COOKIE"]);
+        timeLocal.remove(timeLocal.keys["LEHET_TOKEN"]);
+        timeLocal.remove(timeLocal.keys["LEHET_PROFILE"]);
+      }
     });
 
     return {

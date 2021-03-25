@@ -59,18 +59,22 @@
       <span class="flex-center" @click="qr.visible=false"><i class="iconfont iconzuo"></i>返回账号登录</span>
     </div>
     <div class="c-login__qrcode-page__title flex-center">手机扫码登录</div>
-    <div class="c-login__qrcode-page__tip flex-center">使用<a href="http://www.kuwo.cn/down">酷我音乐App</a>扫描二维码</div>
-    <div class="c-login__qrcode-page__wrapper" :class="{active: !qr.timeout}">
+    <div class="c-login__qrcode-page__tip flex-center">使用<a target="_blank" href="https://music.163.com/#/download">网易云音乐App</a>扫描二维码</div>
+    <div class="c-login__qrcode-page__wrapper" :class="{active:!qr.timeout&&qr.authorized}">
       <div class="c-login__qrcode-page__guide-img flex-center">我其实是一张图片，用于引导你如何操作，但是条件有限，凑合着看吧</div>
       <div class="c-login__qrcode-page__qrcode absolute-center">
         <img :src="qr.base64" alt="">
-        <div class="c-login__qrcode-page__mask flex-center" v-show="qr.timeout">
-          <div class="c-login__qrcode-page__btn flex-center">二维码已过期</div>
+        <div class="c-login__qrcode-page__mask flex-center" v-show="qr.timeout" @click.once="onQrcodeRefresh">
+          <div class="c-login__qrcode-page__btn flex-center" v-if="!qr.refreshing">二维码已过期</div>
+          <i class="iconfont iconloading" v-else></i>
+        </div>
+        <div class="c-login__qrcode-page__authorized flex-center" v-show="qr.authorized">
+          授权中
         </div>
       </div>
     </div>
     <div class="c-login__qrcode-page__guide-text flex-center">
-      酷我音乐App - 首页右上角更多 - 扫一扫登录{{user && user.nickname}}
+      网易云音乐App - 首页右上角更多 - 扫一扫登录{{user && user.nickname}}
     </div>
   </div>
   <div class="c-login__close flex-center" @click="createLoginWindow(true)">
@@ -85,8 +89,14 @@ import CInput from "@/components/input/input.vue";
 import CRadio from "@/components/radio/radio.vue";
 import CountdownBtn from "@/components/countdown-btn/countdown-btn.vue";
 import {createLoginWindow, createRegisterWindow, toast} from "@/components/hook.js";
-import {doLoginByCellPhone, getQrLoginKey, getQRLoginBase64, checkQrLoginStatus} from "@/request/index.js";
-import {ref, nextTick, watch, computed} from "vue";
+import {
+  doLoginByCellPhone, 
+  getQrLoginKey,
+  getQRLoginBase64, 
+  checkQrLoginStatus, 
+  getLoginStatus
+} from "@/request/index.js";
+import {ref, nextTick, watch, computed, onUnmounted} from "vue";
 import {useStore} from "vuex";
 import {myLocal} from "@/utils/storage.js";
 import defaultQrcode from "../../../assets/imgs/default_qrcode.png";
@@ -104,6 +114,7 @@ export default {
     CountdownBtn
   },
   setup(props, context) {
+    // 从本地获取保存的账号
     let accountInfo = myLocal.get(myLocal.keys["LEHE_ACCOUNT_INFO"]) || {};
     let tabbar = ref([
       {name: "账号登录", active: true},
@@ -123,10 +134,13 @@ export default {
     });
     // 扫码登录相关数据
     let qr = ref({
-      visible: false,
-      base64: defaultQrcode,
-      timeId: null,
-      timeout: true
+      visible: false, // 用于控制扫码登录显示的标记位
+      key: "", // 用于生成登录二维码的key
+      base64: defaultQrcode, // 获取到的登录码base64
+      timeId: null, // 轮询检测的定时器id
+      timeout: false, // 超时标记
+      authorized: false, // 授权中状态标记
+      refreshing: false // 正在刷新标记
     });
     let store = useStore();
     let user = computed(() => {
@@ -141,66 +155,72 @@ export default {
         form.value.state = "notready";
       }
     });
-
-    // 切换到扫码的方式登录
-    let onQrcodeLogin = function() {
-      qr.value.visible = true;
-      if(qr.value.visible) {
-        let _key = null;
-        getQrLoginKey().then(data => {
-          _key = data.data.unikey;
-          getQRLoginBase64({
-            params: {
-              key: _key,
-              qrimg: true
-            }
-          }).then(data => {
-            qr.value.base64 = data.data.qrimg;
-            qr.value.timeId = setInterval(() => {
-              checkQrLoginStatus({
-                params: {
-                  key: _key
-                }
-              }).then(data => {
-                console.log(data, 123);
-                switch(data.code) {
-                  case 800: {
-                    toast({
-                      message: "二维码已过期",
-                      icon: "iconzhuyi"
-                    });
-                    clearInterval(qr.value.timeId);
-                  } break;
-                  case 801: break;
-                  case 802: break;
-                  case 803: {
-                    toast({
-                      message: "授权登录成功",
-                      icon: "iconzhuyi"
-                    });
-                    createLoginWindow(true);
-                    clearInterval(qr.value.timeId);
-                  } break;
-                  default: "";
+    // 生成扫码登录的 key和二维码
+    let onQrcodeRefresh = async function() {
+      qr.value.refreshing = true;
+      await getQrLoginKey().then(data => {
+        qr.value.key = data.data.unikey;
+      });
+      await getQRLoginBase64({
+        params: {key: qr.value.key,qrimg: true}
+      }).then(data => {
+        qr.value.base64 = data.data.qrimg;
+        qr.value.timeout = false;
+        qr.value.refreshing = false;
+        qr.value.authorized = false;
+      });
+      qr.value.timeId = setInterval(() => {
+        checkQrLoginStatus({
+          params: {key: qr.value.key}
+        }).then(data => {
+          let {code} = data;
+          switch(code) {
+            case 800: {
+              toast({message: "二维码已过期"});
+              qr.value.timeout = true;
+              clearInterval(qr.value.timeId);
+            } break;
+            case 801: break;
+            case 802: {
+              qr.value.authorized = true;
+            } break;
+            case 803: {
+              store.commit("setCookie", {cookie: data.cookie})
+              toast({message: "授权登录成功"});
+              createLoginWindow(true);
+              clearInterval(qr.value.timeId);
+              getLoginStatus().then(data => {
+                let {code, profile} = data.data;
+                store.commit("setProfile", {profile});
+                if(code !== 200) {
+                  timeLocal.remove(timeLocal.keys["LEHET_COOKIE"]);
+                  timeLocal.remove(timeLocal.keys["LEHET_TOKEN"]);
+                  timeLocal.remove(timeLocal.keys["LEHET_PROFILE"]);
                 }
               });
-            }, 1000);
-          });
+            } break;
+            default: "";
+          }
         });
+      }, 1500);
+    }
+    // 切换到扫码的方式登录
+    let onQrcodeLogin =  async function() {
+      qr.value.visible = true;
+      if(!qr.value.visible) {
+        return;
       }
+      onQrcodeRefresh();
     }
     // 登录
     let onLogin = function() {
       if(!form.value.isAgree) {
-        toast({
-          message: "请同意《xx音乐用户服务协议》《隐私政策》",
-          icon: "iconzhuyi"
-        });
+        toast({message: "请同意《xx音乐用户服务协议》《隐私政策》"});
         return;
       }
+      let reg = /(^\S+)/;
+      form.value.tip = "";
       if(tabbar.value[0].active) {
-        form.value.tip = "";
-        let reg = /(^\S+)/;
         let _isAccount = !reg.test(form.value.acountNum);
         let _isPwd = !reg.test(form.value.accountPwd);
         if(_isAccount && _isPwd) {
@@ -219,34 +239,43 @@ export default {
             password: form.value.accountPwd
           }
         }).then((data) => {
-          let _type = Object.prototype.toString.call(data) 
-          if(_type == "[object String]") {
-            toast({
-              message: data,
-              icon: "iconzhuyi"
-            });
+          let {code, message} = data;
+          if(code !== 200) {
+            toast({message});
           } else {
             store.commit("setLoginInfo", data);
             createLoginWindow(true);
-            toast({
-              message: "登录成功",
-              icon: "iconzhuyi"
-            });
-            if(form.value.isRemmenber) {
-              myLocal.set(myLocal.keys["LEHE_ACCOUNT_INFO"], {
-                phone: form.value.acountNum,
-                password: form.value.accountPwd,
-                isRemmenber: true
-              });
-            } else {
-              myLocal.remove(myLocal.keys["LEHE_ACCOUNT_INFO"]);
-            }
+            toast({message: "登录成功"});
+            form.value.isRemmenber ? 
+            myLocal.set(myLocal.keys["LEHE_ACCOUNT_INFO"], {
+              phone: form.value.acountNum,
+              password: form.value.accountPwd,
+              isRemmenber: true
+            })
+            : myLocal.remove(myLocal.keys["LEHE_ACCOUNT_INFO"]);
           }
         });
       } else {
-
+        // 验证手机号码是否正确的正则
+        let phoneReg = /0?(13|14|15|17|18|19)[0-9]{9}/;
+        let _isPhone = !phoneReg.test(form.value.phoneNum);
+        let _isNull = !reg.test(form.value.phoneCode);
+        console.log(_isPhone, _isNull, form.value)
+        if(_isPhone) {
+          form.value.tip = "手机号格式不正确";
+        } else if(_isNull) {
+          form.value.tip = "验证码不能为空";
+        }
+        if(form.value.tip) {
+          return;
+        }
+        toast({message: "网易云暂不支持验证码方式登录"});
       }
     }
+    // 组件销毁时的生命钩子
+    onUnmounted(() => {
+      clearInterval(qr.value.timeId);
+    });
 
     return {
       tabbar,
@@ -255,6 +284,7 @@ export default {
       user,
       onQrcodeLogin,
       onLogin,
+      onQrcodeRefresh,
       createLoginWindow,
       createRegisterWindow
     }
@@ -469,13 +499,26 @@ export default {
       transition: all 0.5s ease;
       position: relative;
     }
-    &__mask {
+    &__mask,
+    &__authorized {
       width: 100%;
       height: 100%;
       position: absolute;
       left: 0px;
       top: 0px;
       background-color: rgba(255, 255, 255, 0.9);
+    }
+    &__authorized {
+      background-color: #FFF;
+      box-shadow: 0px 0px 1px 1px rgba(0, 0, 0,0.1);
+      color: $color-font-main;
+      font-size: $font-size-l;
+    }
+    &__mask {
+      .iconfont {
+        animation: ani_loading 1s linear infinite;
+        font-size: $font-size-xl;
+      }
     }
     &__btn {
       padding: 5px 5px;

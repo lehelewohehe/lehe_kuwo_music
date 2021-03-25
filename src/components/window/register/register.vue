@@ -57,18 +57,19 @@
     </div>
     <div class="c-register__code">
       <c-input-title name="验证码" 
-      tip="你们好，小宝贝" 
+      tip="请输入验证码" 
       :isTip="form.code.isError" 
       style="margin-bottom: 12px;"></c-input-title>
       <c-input v-model:value="form.code.value" 
       placeholder="请输入接收到的验证码" 
-      :isError="form.code.isError">
+      :isError="form.code.isError"
+      @blur="onCheckCode">
         <template #button>
           <countdown-btn v-model:state="form.code.state"></countdown-btn>
         </template>
       </c-input>
     </div>
-    <div class="c-register__confirm-register flex-center">确认注册</div>
+    <div class="c-register__confirm-register flex-center" @click="onConfirmRegister">确认注册</div>
     <div class="c-register__login" 
     @click="() => {createLoginWindow();createRegisterWindow(true);}">已有账号，立即登录></div>
   </div>
@@ -80,7 +81,8 @@ import {ref, watch} from "vue";
 import CInput from "@/components/input/input.vue";
 import CInputTitle from "@/components/input-title/input-title.vue";
 import CountdownBtn from "@/components/countdown-btn/countdown-btn.vue";
-import {createRegisterWindow, createLoginWindow} from "@/components/hook.js";
+import {createRegisterWindow, createLoginWindow, toast} from "@/components/hook.js";
+import {checkPhoneRegistered, getCodeByPhoneNumber} from "@/request/index.js";
 export default {
   props: {
     visible: {
@@ -135,6 +137,16 @@ export default {
         form.value.code.state = "notready";
       }
     });
+    // 监听倒计时的状态，当状态时pending时发送验证码请求
+    watch(() => form.value.code.state, (next, pre) => {
+      console.log(next, pre);
+      if(next == "pending") {
+        getCodeByPhoneNumber(form.value.phone.value)
+        .then(data => {
+          console.log(data, 1234);
+        });
+      }
+    });
 
     let onCheckPhone = function() {
       // 验证手机号码是否正确的正则
@@ -150,6 +162,28 @@ export default {
     let onCheckPasswordAgain = function() {
       form.value.passwordAgain.isError = form.value.password.value !== form.value.passwordAgain.value;
     }
+    // 检测验证码是否合法
+    let onCheckCode = function() {
+      let reg = /(^\S+)/;
+      form.value.code.isError = !reg.test(form.value.code.value);
+    }
+    // 确认注册
+    let onConfirmRegister = async function() {
+      let arr = Object.values(form.value);
+      // 检测是不是所有的输入信息都合法
+      for(let item in arr) {
+        if(!item.isError) {
+          toast({message: "上述表单中有不合法的信息"});
+          break;
+        }
+      }
+      // 检查该手机号是否已被注册
+      let phoneData = await checkPhoneRegistered(form.value.phone.value);
+      if(phoneData.exist == 1) {
+        toast({message: "手机号已注册"});
+        return;
+      }
+    }
 
     return {
       form,
@@ -157,7 +191,9 @@ export default {
       createLoginWindow,
       onCheckPhone,
       onCheckPassword,
-      onCheckPasswordAgain
+      onCheckPasswordAgain,
+      onCheckCode,
+      onConfirmRegister
     }
   }
 }

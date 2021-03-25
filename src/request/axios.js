@@ -4,7 +4,9 @@ import qs from "qs";
 const instance = axios.create({
   baseURL: 'http://localhost:3000',
   timeout: 60000,
-  headers: {'Content-Type': "application/json;charset=utf-8"}
+  headers: {
+    "Content-Type": "application/json;charset=utf-8"
+  }
 });
 
 // 异常拦截处理器
@@ -54,7 +56,7 @@ instance.interceptors.response.use(function (response) {
   // 根据 code 进行判断
   if (code === undefined) {
     // 如果没有 code 代表这不是项目后端开发的接口
-    return dataAxios;
+    dataAxios.message = dataAxios.message ? dataAxios.message : "不是标准的接口";
   } else {
     // 有 code 代表这是一个后端接口 可以进行进一步的判断
     switch (code) {
@@ -62,17 +64,18 @@ instance.interceptors.response.use(function (response) {
       case 800:
       case 801:
       case 802:
-      case 803:
+      case 803: break;
         // [ 示例 ] code === 200 代表没有错误
-        return dataAxios;
       case 400:
         // [ 示例 ] 其它和后台约定的 code
-        return "无效的参数";
+        dataAxios.message = "无效的参数";
+        break;
       default:
         // 不是正确的 code
-        return dataAxios.message || "不是正确的code";
+        dataAxios.message = dataAxios.message ? dataAxios.message : "不是正确的code";
     }
   }
+  return dataAxios;
 }, errorHandler);
 
 export default instance;

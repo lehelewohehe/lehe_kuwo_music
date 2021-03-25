@@ -1,6 +1,14 @@
 import axios from "@/request/axios.js";
-import {timeLocal} from "@/utils/storage.js";
-let cookie = timeLocal.get(timeLocal.keys["LEHET_COOKIE"]);
+import store from "@/store/index.js";
+import {createApp, toRefs} from "vue";
+let {cookie} = toRefs(store.state.user);
+// 下面用于测试cookie的响应式以及是否可以被监听
+let app = createApp({});
+let container = document.createElement("div");
+let instance = app.mount(container);
+instance.$watch(() => cookie.value, (newVal, oldVal) => {
+  console.log(newVal, 123, oldVal);
+});
 
 // 通过手机号登录
 export function doLoginByCellPhone(config={}) {
@@ -24,7 +32,27 @@ export function checkQrLoginStatus(config={}) {
 
 // 登录刷新
 export function doLoginRefresh(config={}) {
-  return axios.post(`/login/refresh`, {cookie});
+  return axios.post(`/login/refresh`, {cookie: cookie.value});
+}
+
+// 获取当前登录状态
+export function getLoginStatus(config={}) {
+  return axios.post("/login/status", {cookie: cookie.value});
+}
+
+// 退出登录的接口
+export function quitLogin(config={}) {
+  return axios.get("/logout", config);
+}
+
+// 检查该手机号是否已经被注册
+export function checkPhoneRegistered(phone) {
+  return axios.get(`/cellphone/existence/check?phone=${phone}`);
+}
+
+// 发送验证码
+export function getCodeByPhoneNumber(phone) {
+  return axios.get(`/captcha/sent?phone=${phone}`);
 }
 
 // 获取账号信息
