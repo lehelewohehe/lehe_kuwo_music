@@ -3,7 +3,7 @@ import CLogin from "@/components/window/login/login.vue";
 import CRegister from "@/components/window/register/register.vue";
 import {createApp, reactive, ref, toRefs} from "vue";
 import store from "@/store/index.js";
-
+import router from "@/router/index.js";
 
 // 动态创建轻提示组件
 export let toast = (function() {
@@ -39,6 +39,7 @@ export let createLoginWindow = (function() {
     document.body.appendChild(container);
     _app = createApp(CLogin, _obj);
     _app.use(store);
+    _app.use(router);
     _app.mount(container);
   }
 })();

@@ -8,6 +8,41 @@ import {createRouter, createWebHashHistory} from "vue-router";
 // 每个路由都需要映射到一个组件。
 // 我们后面再讨论嵌套路由。
 const routes = [
+  {
+    path: "/", 
+    redirect: "/recommend"
+  },
+  {
+    path: "/recommend",
+    name: "recommend",
+    component: () => import("@/pages/recommend/index.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("@/pages/recommend/subpages/choice.vue")
+      },
+      {
+        path: "choice",
+        name: "recommend_choice",
+        component: () => import("@/pages/recommend/subpages/choice.vue")
+      },
+      {
+        path: "singer",
+        name: "recommend_singer",
+        component: () => import("@/pages/recommend/subpages/singer.vue")
+      },
+      {
+        path: "ranking-list",
+        name: "recommend_ranking-list",
+        component: () => import("@/pages/recommend/subpages/choice.vue")
+      },
+      {
+        path: "song-sheet",
+        name: "recommend_song-sheet",
+        component: () => import("@/pages/recommend/subpages/song-sheet.vue")
+      },
+    ]
+  },
 ];
 
 // 3. 创建路由实例并传递 `routes` 配置

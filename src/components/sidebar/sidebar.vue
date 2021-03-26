@@ -124,7 +124,6 @@ export default {
     }
     // 用户个人业务
     let onPersonalService = function(e) {
-      console.log(e, 88);
       switch(e) {
         case "icongeren": {
 
@@ -149,6 +148,7 @@ export default {
         } break;
         default: ;
       }
+      boxVisible.value = false;
     }
 
     return {

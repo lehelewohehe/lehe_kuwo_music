@@ -65,7 +65,7 @@
       :isError="form.code.isError"
       @blur="onCheckCode">
         <template #button>
-          <countdown-btn v-model:state="form.code.state"></countdown-btn>
+          <countdown-btn @click="onCountdownEvent" :ready="form.code.ready"></countdown-btn>
         </template>
       </c-input>
     </div>
@@ -82,7 +82,7 @@ import CInput from "@/components/input/input.vue";
 import CInputTitle from "@/components/input-title/input-title.vue";
 import CountdownBtn from "@/components/countdown-btn/countdown-btn.vue";
 import {createRegisterWindow, createLoginWindow, toast} from "@/components/hook.js";
-import {checkPhoneRegistered, getCodeByPhoneNumber} from "@/request/index.js";
+import {checkPhoneRegistered, getCodeByPhoneNumber, doPhoneRegister} from "@/request/index.js";
 export default {
   props: {
     visible: {
@@ -117,7 +117,7 @@ export default {
       code: {
         value: "",
         isError: false,
-        state: "notready"
+        ready: false
       }
     });
 
@@ -131,23 +131,15 @@ export default {
     // 监听电话号码，实时改变倒计时组件的状态
     watch(() => form.value.phone.value, (next, pre) => {
       let reg = /^1(?:3\d|4[4-9]|5[0-35-9]|6[67]|7[013-8]|8\d|9\d)\d{8}$/;
-      if(reg.test(next)) {
-        form.value.code.state = "ready";
-      } else {
-        form.value.code.state = "notready";
-      }
-    });
-    // 监听倒计时的状态，当状态时pending时发送验证码请求
-    watch(() => form.value.code.state, (next, pre) => {
-      console.log(next, pre);
-      if(next == "pending") {
-        getCodeByPhoneNumber(form.value.phone.value)
-        .then(data => {
-          console.log(data, 1234);
-        });
-      }
+      form.value.code.ready = reg.test(next);
     });
 
+    let onCountdownEvent = function() {
+      getCodeByPhoneNumber(form.value.phone.value)
+      .then(data => {
+        console.log(data, 1234);
+      });
+    }
     let onCheckPhone = function() {
       // 验证手机号码是否正确的正则
       let reg = /0?(13|14|15|17|18|19)[0-9]{9}/;
@@ -169,20 +161,28 @@ export default {
     }
     // 确认注册
     let onConfirmRegister = async function() {
+      onCheckPhone();
+      onCheckPassword();
+      onCheckPasswordAgain();
+      onCheckCode();
       let arr = Object.values(form.value);
       // 检测是不是所有的输入信息都合法
       for(let item in arr) {
-        if(!item.isError) {
+        if(item.isError) {
           toast({message: "上述表单中有不合法的信息"});
           break;
         }
       }
       // 检查该手机号是否已被注册
-      let phoneData = await checkPhoneRegistered(form.value.phone.value);
-      if(phoneData.exist == 1) {
-        toast({message: "手机号已注册"});
-        return;
-      }
+      let phone = await checkPhoneRegistered(form.value.phone.value);
+      phone.exist == -1 ? doPhoneRegister({data: {
+        captcha: form.value.code.value,
+        phone: form.value.phone.value,
+        password: form.value.password.value,
+        nickname: form.value.passwordAgain.value,
+      }}).then(data => {
+        console.log(data, 88);
+      }) : toast({message: "手机号已注册"});
     }
 
     return {
@@ -193,7 +193,8 @@ export default {
       onCheckPassword,
       onCheckPasswordAgain,
       onCheckCode,
-      onConfirmRegister
+      onConfirmRegister,
+      onCountdownEvent
     }
   }
 }

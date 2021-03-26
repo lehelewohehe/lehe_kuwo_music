@@ -34,11 +34,55 @@ a {
   align-items: center;
 }
 
+.flex {
+  display: flex;
+}
+
+.flex-fill {
+  flex: 1 1 0;
+}
+
 .fixed-center {
   position: fixed;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-main-start {
+  justify-content: flex-start;
+}
+
+.flex-item-start {
+  align-items: flex-start;
+}
+
+.flex-main-end {
+  justify-content: flex-end;
+}
+
+.flex-item-end {
+  align-items: flex-end;
+}
+
+.flex-main-center {
+  justify-content: center;
+}
+
+.flex-item-center {
+  align-items: center;
+}
+
+.flex-main-between {
+  justify-content: space-between;
+}
+
+.flex-main-around {
+  justify-content: space-around;
 }
 
 .absolute-center {

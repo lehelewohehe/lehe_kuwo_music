@@ -9,7 +9,9 @@
         <div class="p-app__toolbar">
           <c-search></c-search>
         </div>
-        <div class="p-app__container"></div>
+        <div class="p-app__container">
+          <router-view></router-view>
+        </div>
       </div>
     </div>
     <div class="p-app__bottom">
@@ -81,14 +83,17 @@ export default {
   &__right {
     flex: 1 1 0;
     height: 100%;
+    width: 100%;
     background-color: $color-bg-shallow;
-    padding: 0px 26px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
   }
   &__toolbar {
-    width: 100%;
     height: 66px;
     display: flex;
     align-items: center;
+    padding: 0px 30px;
   }
   &__bottom {
     width: 100%;
@@ -97,6 +102,10 @@ export default {
   }
   &__player {
     height: 100%;
+  }
+  &__container {
+    flex: 1 1 0;
+    padding: 0px 30px;
   }
 }
 </style>

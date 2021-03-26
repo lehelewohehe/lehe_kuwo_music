@@ -56,6 +56,11 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: 'vue-loader'
+      },
+      {
+        test: /\.js$/,  // 处理后缀名为js的文件
+        use: 'babel-loader', // 使用babel-loader进行处理
+        exclude: /(node_modules)/  //排除node_modules下的文件
       }
     ],
   },

@@ -1,6 +1,6 @@
 <template>
 <div class="c-login fixed-center" v-show="visible">
-  <div class="c-login__qrcode" @click="onQrcodeLogin">
+  <div class="c-login__qrcode" @click="onQrcodeLogin(true)">
     <i class="iconfont iconzujian-icon-18"></i>
   </div>
   <div class="c-login__qrcode-tip">扫码登录更方便</div>
@@ -30,7 +30,7 @@
           <c-input icon="iconsuo" type="password" 
           v-model:value="form.phoneCode">
             <template #button>
-              <countdown-btn v-model:state="form.state"></countdown-btn>
+              <countdown-btn :ready="form.ready"></countdown-btn>
             </template>
           </c-input>
         </div>
@@ -56,7 +56,7 @@
   </div>
   <div class="c-login__qrcode-page" v-show="qr.visible">
     <div class="c-login__qrcode-page__return">
-      <span class="flex-center" @click="qr.visible=false"><i class="iconfont iconzuo"></i>返回账号登录</span>
+      <span class="flex-center" @click="onQrcodeLogin(false)"><i class="iconfont iconzuo"></i>返回账号登录</span>
     </div>
     <div class="c-login__qrcode-page__title flex-center">手机扫码登录</div>
     <div class="c-login__qrcode-page__tip flex-center">使用<a target="_blank" href="https://music.163.com/#/download">网易云音乐App</a>扫描二维码</div>
@@ -129,7 +129,7 @@ export default {
       isAgree: false,
       isRemmenber: accountInfo.isRemmenber || false,
       isAuto: false,
-      state: "notready",
+      ready: false,
       tip: ""
     });
     // 扫码登录相关数据
@@ -149,11 +149,7 @@ export default {
     // 监听电话号码，实时改变倒计时组件的状态
     watch(() => form.value.phoneNum, (next, pre) => {
       let reg = /^1(?:3\d|4[4-9]|5[0-35-9]|6[67]|7[013-8]|8\d|9\d)\d{8}$/;
-      if(reg.test(next)) {
-        form.value.state = "ready";
-      } else {
-        form.value.state = "notready";
-      }
+      form.value.ready = reg.test(next);
     });
     // 生成扫码登录的 key和二维码
     let onQrcodeRefresh = async function() {
@@ -205,8 +201,9 @@ export default {
       }, 1500);
     }
     // 切换到扫码的方式登录
-    let onQrcodeLogin =  async function() {
-      qr.value.visible = true;
+    let onQrcodeLogin =  async function(flag) {
+      qr.value.visible = flag;
+      clearInterval(qr.value.timeId);
       if(!qr.value.visible) {
         return;
       }

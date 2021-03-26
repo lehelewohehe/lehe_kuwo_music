@@ -1,61 +1,35 @@
 <template>
-<div class="c-countdown-btn flex-center" :class="{active: status.active}" @click="onGetCode">
+<div class="c-countdown-btn flex-center" :class="{active: ready && status.state}" @click="onGetCode">
   {{status.text}}
 </div>
 </template>
 
 <script type="text/javascript">
-import {ref, props, toRefs, watch, onUnmounted} from "vue";
+import {ref, props, toRefs, onUnmounted} from "vue";
 export default {
+  inheritAttrs: false,
   props: {
-    state: {
-      type: String,
-      default: ""
-    }
-  },
-  emits: {
-    "update:state": paload => {
-      console.log(paload, "update:state");
-      return true;
+    ready: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props, context) {
-    let {state} = toRefs(props);
-    let status = ref({text: "", active: false});
+    // 用于控制按钮的各种状态
+    // text 是按钮显示的文字
+    // active 按钮是否已经被激活，在这里我们的场景中指的是电话号码是否合法
+    // state 决定的是当前是处于倒计时还是非倒计时状态
+    let status = ref({text: "获取验证码", state: true});
+    let {ready} = toRefs(props);
     let timeId = null;
     let countdown = 60;
-    let {emit} = context;
-
-    // 根据传入的状态变更与之相关的视图相关数据
-    let setStatusByState = function(next, pre) {
-      // 当定时器倒计时正在进行时，直接返回
-      if(timeId && next != "pending") {
-        return;
-      }
-      switch(next) {
-        case "pending": {
-          status.value.active = false;
-          // 开启倒计时后马上改回之前的状态
-          emit("update:state", pre);
-        } break;
-        case "ready": {
-          status.value.active = true;
-          status.value.text = "获取验证码";
-        } break;
-        case "notready": {
-          status.value.active = false;
-          status.value.text = "获取验证码";
-        } break;
-        default: ;
-      }
-    }
-    // 监听state
-    watch(state, setStatusByState, {immediate: true});
+    let {attrs} = context;
     
     // 获取验证码
     let onGetCode = function() {
-      if(status.value.active) {
-        status.value.active = false;
+      if(ready.value) {
+        status.value.state = false;
+        attrs.onClick && attrs.onClick();
         timeId = setInterval(() => {
           countdown--;
           status.value.text = `重新获取(${countdown})`;
@@ -63,10 +37,10 @@ export default {
             clearInterval(timeId);
             timeId = null;
             countdown = 60;
-            setStatusByState(state.value);
+            status.value.state = true;
+            status.value.text = "获取验证码";
           }
         }, 1000);
-        emit("update:state", "pending");
       }
     }
 

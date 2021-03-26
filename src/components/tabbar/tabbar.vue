@@ -16,6 +16,7 @@
 <script type="text/javascript">
 import {reduce} from "@/utils/utils.js";
 import {toRefs, computed} from "vue";
+import {useRouter,useRoute} from 'vue-router';
 export default {
   props: {
     list: {
@@ -57,9 +58,35 @@ export default {
   },
   setup(props, context) {
     let {textStyle, activeStyle, list} = toRefs(props);
-    let getTextStyle = computed(reduce(textStyle));
+    let getTextStyle = computed(reduce(Object.assign({
+      "font-size": "16px",
+      color: "#323232",
+      height: '40px',
+      padding: "0px 4px"
+    }, textStyle.value)));
     let getActiveStyle = computed(reduce(activeStyle));
     let {emit} = context;
+    const router = useRouter();
+    const route = useRoute();
+    let {path} = route;
+
+    // 当页面刷新的时候初始化tabbar
+    let initTabbar = function() {
+      let _list = JSON.parse(JSON.stringify(list.value));
+      for(let item of _list) {
+        if(item.path == path) {
+          _list[0].active = false;
+          item.active = true;
+          break;
+        } else {
+          if (_list[0].name != item.name) {
+            item.active = false;
+          }
+        }
+      }
+      emit("update:list", _list);
+    }
+    list.value[0]?.path ? initTabbar() : "";
 
     let setCurrentIndex = function(list, index) {
       list.some((item) => {
@@ -69,10 +96,13 @@ export default {
         }
       });
       list[index].active = true;
+      if(list[index].path) {
+        router.push({path: list[index].path});
+      }
     }
     let onSetCurrentIndex = function(index) {
       let _list = JSON.parse(JSON.stringify(list.value));
-      setCurrentIndex(_list, index)
+      setCurrentIndex(_list, index);
       emit("update:list", _list);
     }
 

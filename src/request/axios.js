@@ -1,5 +1,6 @@
 import axios from "axios";
 import qs from "qs";
+import {toast} from "@/components/hook.js";
 
 const instance = axios.create({
   baseURL: 'http://localhost:3000',
@@ -11,7 +12,9 @@ const instance = axios.create({
 
 // 异常拦截处理器
 const errorHandler = (error) => {
+  console.dir(error, 90);
   const status = error?.response?.status;
+  const data = error?.response?.data || {};
   switch (status) {
     case 301: error.message = "需要登录"; break;
     case 400: error.message = '请求错误'; break;
@@ -27,6 +30,7 @@ const errorHandler = (error) => {
     case 505: error.message = 'HTTP版本不受支持'; break;
     default: break;
   }
+  toast({message: data.message || data.msg});
   return Promise.reject(error);
 };
 

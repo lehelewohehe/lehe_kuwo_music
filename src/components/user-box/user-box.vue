@@ -34,7 +34,6 @@ export default {
     }
   },
   setup(props, context) {
-    console.log(context)
   }
 }
 </script>

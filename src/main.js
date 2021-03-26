@@ -1,3 +1,4 @@
+import "@babel/polyfill";
 import "@/assets/css/init.css";
 import "@/assets/css/base.css";
 import "@/assets/css/iconfont.css";

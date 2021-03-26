@@ -55,6 +55,11 @@ export function getCodeByPhoneNumber(phone) {
   return axios.get(`/captcha/sent?phone=${phone}`);
 }
 
+// 注册
+export function doPhoneRegister(config={}) {
+  return axios.post("/register/cellphone", config.data, config);
+}
+
 // 获取账号信息
 export function getAccountInfo(config={}) {
   return axios.get("/user/account");
