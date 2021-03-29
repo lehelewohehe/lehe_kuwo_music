@@ -64,3 +64,8 @@ export function doPhoneRegister(config={}) {
 export function getAccountInfo(config={}) {
   return axios.get("/user/account");
 }
+
+// 获取pc端banner数据
+export function getBanner(type=2) {
+  return axios.get(`/banner?type=${type}`);
+} 

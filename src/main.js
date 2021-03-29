@@ -9,7 +9,6 @@ import router from "@/router/index.js";
 import store from "@/store/index.js";
 import globalComponents from "@/components/index.js";
 
-console.log(Vue)
 // 5. 创建并挂载根实例
 const app = createApp(root);
 // 确保 _use_ 路由实例使

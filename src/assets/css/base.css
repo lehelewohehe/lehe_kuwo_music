@@ -28,6 +28,15 @@ a {
   text-decoration: none;
 }
 
+ul,li {
+  padding: 0px;
+  margin: 0px;
+}
+
+li {
+  list-style: none;
+}
+
 .flex-center {
   display: flex;
   justify-content: center;
