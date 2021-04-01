@@ -36,7 +36,7 @@ export default {
     getLoginStatus().then(data => {
       let {code, profile} = data.data;
       store.commit("setProfile", {profile});
-      if(code !== 200) {
+      if(!profile) {
         timeLocal.remove(timeLocal.keys["LEHET_COOKIE"]);
         timeLocal.remove(timeLocal.keys["LEHET_TOKEN"]);
         timeLocal.remove(timeLocal.keys["LEHET_PROFILE"]);
@@ -106,6 +106,7 @@ export default {
   &__container {
     flex: 1 1 0;
     padding: 0px 30px;
+    overflow: scroll;
   }
 }
 </style>

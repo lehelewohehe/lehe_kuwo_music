@@ -11,6 +11,7 @@ import CRadio from "@/components/radio/radio.vue";
 import CInputTitle from "@/components/input-title/input-title.vue";
 import CUserBox from "@/components/user-box/user-box.vue";
 import CSwiper from "@/components/swiper/swiper.vue";
+import CGoodsBox from "@/components/goods-box/goods-box.vue";
 
 const infos = [
   {name: "c-avatar", component: CAvatar},
@@ -24,7 +25,8 @@ const infos = [
   {name: "c-radio", component: CRadio},
   {name: "c-input-title", component: CInputTitle},
   {name: "c-user-box", component: CUserBox},
-  {name: "c-swiper", component: CSwiper}
+  {name: "c-swiper", component: CSwiper},
+  {name: "c-goods-box", component: CGoodsBox}
 ]
 export default function(app, options) {
   infos.forEach((item) => {

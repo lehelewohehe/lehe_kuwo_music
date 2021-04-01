@@ -1,7 +1,9 @@
 <template>
 <div class="p-recommend">
   <c-tab-bar v-model:list="tabbar" bothSides="40px" :textStyle="{'font-size': '14px'}"></c-tab-bar>
-  <router-view></router-view>
+  <div class="p-recommend__container">
+    <router-view></router-view>
+  </div>
 </div>
 </template>
 
@@ -28,4 +30,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.p-recommend {
+  
+}
 </style>

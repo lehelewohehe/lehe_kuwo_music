@@ -19,27 +19,27 @@ const routes = [
     children: [
       {
         path: "",
-        component: () => import("@/pages/recommend/subpages/choice.vue")
+        component: () => import("@/pages/recommend/subpages/choice/choice.vue")
       },
       {
         path: "choice",
         name: "recommend_choice",
-        component: () => import("@/pages/recommend/subpages/choice.vue")
+        component: () => import("@/pages/recommend/subpages/choice/choice.vue")
       },
       {
         path: "singer",
         name: "recommend_singer",
-        component: () => import("@/pages/recommend/subpages/singer.vue")
+        component: () => import("@/pages/recommend/subpages/singer/singer.vue")
       },
       {
         path: "ranking-list",
         name: "recommend_ranking-list",
-        component: () => import("@/pages/recommend/subpages/choice.vue")
+        component: () => import("@/pages/recommend/subpages/ranking-list/ranking-list.vue")
       },
       {
         path: "song-sheet",
         name: "recommend_song-sheet",
-        component: () => import("@/pages/recommend/subpages/song-sheet.vue")
+        component: () => import("@/pages/recommend/subpages/song-sheet/song-sheet.vue")
       },
     ]
   },

@@ -68,4 +68,24 @@ export function getAccountInfo(config={}) {
 // 获取pc端banner数据
 export function getBanner(type=2) {
   return axios.get(`/banner?type=${type}`);
-} 
+}
+
+// 获取每日推荐歌单 无需登录
+export function getRecommendSongList(limit=10) {
+  return axios.get(`/personalized?limit=${limit}`);
+}
+
+// 获取每日推荐歌曲 需要登录
+export function getRecommendSongs() {
+  return axios.post("/recommend/songs", {cookie: cookie.value});
+}
+
+// 获取推荐电台
+export function getRecommendRadioStation() {
+  return axios.get("/personalized/djprogram");
+}
+
+// 获取最新mv
+export function getNewMv(limit=5) {
+  return axios.get(`/mv/first?limit=${limit}`);
+}
