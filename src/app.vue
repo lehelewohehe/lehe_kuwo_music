@@ -9,7 +9,7 @@
         <div class="p-app__toolbar">
           <c-search></c-search>
         </div>
-        <div class="p-app__container">
+        <div class="p-app__container" v-anchor="{right:'30px', bottom:'20px'}">
           <router-view></router-view>
         </div>
       </div>
@@ -88,6 +88,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    position: relative;
   }
   &__toolbar {
     height: 66px;
@@ -106,7 +107,7 @@ export default {
   &__container {
     flex: 1 1 0;
     padding: 0px 30px;
-    overflow: scroll;
+    overflow-y: scroll;
   }
 }
 </style>

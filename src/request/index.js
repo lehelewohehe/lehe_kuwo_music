@@ -89,3 +89,8 @@ export function getRecommendRadioStation() {
 export function getNewMv(limit=5) {
   return axios.get(`/mv/first?limit=${limit}`);
 }
+
+// 新碟上架
+export function getNewDisc(limit=30) {
+  return axios.get(`/top/album?limit=${limit}`);
+}

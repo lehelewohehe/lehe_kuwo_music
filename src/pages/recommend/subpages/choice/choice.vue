@@ -16,7 +16,7 @@
   <c-choice-title title="推荐电台"></c-choice-title>
   <div class="p-choice__radio-station">
     <div class="p-choice__radio-station__item" 
-    v-for="item in radioStations.slice(0,5)" :key="item.id">
+    v-for="item in radioStations" :key="item.id">
       <c-goods-box :avatar="item.picUrl" 
       :supplement="item.playCount" 
       :title="item.name"></c-goods-box>
@@ -25,7 +25,7 @@
   <c-choice-title title="最潮视频"></c-choice-title>
   <div class="p-choice__mv">
     <div class="p-choice__mv__item" 
-    v-for="item in newMvs.slice(0,4)" :key="item.key">
+    v-for="item in newMvs" :key="item.id">
       <c-goods-box :avatar="item.cover" 
       :supplement="item.playCount" 
       :title="item.name"
@@ -35,12 +35,19 @@
   </div>
   <c-choice-title title="新碟上架"></c-choice-title>
   <div class="p-choice__new-disc">
-    新碟上架
+    <div class="p-choice__new-disc__item" 
+    v-for="item in newDiscs" :key="item.id">
+      <c-goods-box :avatar="item.blurPicUrl" 
+      :supplement="item.publishTime" 
+      :title="item.name"
+      :author="item.author"
+      maskIconPos="right-bottom"></c-goods-box>
+    </div>
   </div>
-  <c-choice-title title="音乐周边"></c-choice-title>
+  <!-- <c-choice-title title="音乐周边"></c-choice-title>
   <div class="p-choice__singer">
     音乐周边
-  </div>
+  </div> -->
 
 </div>
 </template>
@@ -49,6 +56,7 @@
 import {
   getNewMv,
   getBanner,
+  getNewDisc,
   getRecommendSongList,
   getRecommendSongs,
   getRecommendRadioStation
@@ -68,6 +76,7 @@ export default {
     let songLists = ref([]);
     let radioStations = ref([]);
     let newMvs = ref([]);
+    let newDiscs = ref([]);
     let store = useStore();
     getBanner().then(data => {
       let {banners=[]} = data;
@@ -84,7 +93,7 @@ export default {
     });
     getRecommendRadioStation().then(data => {
       let {result} = data;
-      radioStations.value = result.map((item) => {
+      radioStations.value = result.slice(0, 5).map((item) => {
         let playCount = item?.program?.adjustedPlayCount;
         let count = Math.floor(playCount / 10000);
         item.playCount = `<i class="iconfont iconicon--"></i>${count ? `${count}万` : playCount}`;
@@ -92,19 +101,29 @@ export default {
       });
     });
     getNewMv().then(data => {
-      newMvs.value = data.data.map((item) => {
+      newMvs.value = data.data.slice(0, 4).map((item) => {
         let count = Math.floor(item.playCount / 10000);
         item.playCount = `<i class="iconfont iconshangchuanshipin" style="margin-right: 2px">
         </i>${count ? `${count}万` : item.playCount}`;
         return item;
       });
-      console.log(data, 8);
+    });
+    getNewDisc().then(data => {
+      let {weekData} = data;
+      newDiscs.value = weekData.slice(0, 5).map((item) => {
+        item.publishTime = new Date(item.publishTime).toLocaleDateString();
+        item.author = item.artists.map(item => {
+          return item.name;
+        }).join("/");
+        return item;
+      });
     });
     return {
       bannerList,
       songLists,
       radioStations,
-      newMvs
+      newMvs,
+      newDiscs
     };
   }
 }
@@ -124,7 +143,8 @@ export default {
     justify-content: space-between;
   }
   &__singer,
-  &__radio-station {
+  &__radio-station,
+  &__new-disc {
     &__item {
       flex: 18.4% 0 0;
       margin-bottom: 20px;

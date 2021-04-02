@@ -8,8 +8,8 @@
     </div>
   </div>
   <div class="c-goods-box__desc">
-    <div class="c-goods-box__title">{{title}}</div>
-    <div class="c-goods-box__author">{{author}}</div>
+    <div class="c-goods-box__title" v-if="title">{{title}}</div>
+    <div class="c-goods-box__author" v-if="author">{{author}}</div>
   </div>
 </div>
 </template>
@@ -120,6 +120,14 @@ export default {
     color: $color-font-main;
     font-size: $font-size-xs;
     line-height: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: box;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    width: 100%;
+    word-break:break-all;
   }
   &__author {
     color: $color-font-gray;

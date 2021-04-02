@@ -118,8 +118,9 @@ module.exports = {
     // 指定html模板
     new HtmlWebpackPlugin({
       title: "Webpack 开发环境配置",
-      template: "./public/index.html",
-      inject: "body"  
+      template: path.resolve(__dirname, "public/index.html"),
+      inject: "body",
+      favicon: path.resolve(__dirname, "public/favicon.ico")
     }),
     //清除dist构建目录文件
     new CleanWebpackPlugin(),

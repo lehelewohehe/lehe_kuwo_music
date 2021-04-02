@@ -212,7 +212,7 @@ img{
   z-index: 6;
 }
 .btn{
-  transition: all 0.3s ease;
+  transition: background 0.3s ease;
   flex: 1;
   background: $color-bg-deep;
   border-radius: 2px;
