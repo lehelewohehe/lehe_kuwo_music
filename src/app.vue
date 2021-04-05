@@ -9,8 +9,10 @@
         <div class="p-app__toolbar">
           <c-search></c-search>
         </div>
-        <div class="p-app__container" v-anchor="{right:'30px', bottom:'20px'}">
-          <router-view></router-view>
+        <div class="p-app__scroll">
+          <div class="p-app__container" v-anchor="{right:'30px', bottom:'20px'}" v-scroll>
+            <router-view></router-view>
+          </div>
         </div>
       </div>
     </div>
@@ -88,13 +90,13 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    position: relative;
   }
   &__toolbar {
     height: 66px;
     display: flex;
     align-items: center;
     padding: 0px 30px;
+    flex: 0 0 auto;
   }
   &__bottom {
     width: 100%;
@@ -104,10 +106,15 @@ export default {
   &__player {
     height: 100%;
   }
+  &__scroll {
+    position: relative;
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
   &__container {
-    flex: 1 1 0;
     padding: 0px 30px;
     overflow-y: scroll;
+    height: 100%;
   }
 }
 </style>

@@ -1,5 +1,5 @@
 // 节流
-export const throttle = function(fn, interval) {
+export const throttle = function(fn, interval=100) {
   let pre = new Date().getTime();
   return function() {
    let now = new Date().getTime();

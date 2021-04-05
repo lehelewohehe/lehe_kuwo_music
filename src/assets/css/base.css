@@ -105,6 +105,7 @@ li {
   box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.1);
 }
 
+/*锚点指令相关类样式*/
 .v-anchor {
   position: absolute;
   z-index: 1000;
@@ -126,6 +127,34 @@ li {
 }
 .v-anchor:hover {
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+/*loading指令相关类样式*/
+.hide-scrollbar {
+　　scrollbar-width:none;/*Firefox*/
+　　-ms-overflow-style:none;/*IE10+*/
+}
+.hide-scrollbar::-webkit-scrollbar{
+  display:none;/*ChromeSafari*/
+}
+.v-scroll__wrapper {
+  width: 0px;
+  height: 100%;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+}
+.v-scroll__inner {
+  width: 10px;
+  background-color: #e8e8e8;
+  position: absolute;
+  right: 0px;
+  border-radius: 5px;
+  transition: top 0.1s ease;
+}
+
+.v-scroll__inner:hover {
+  background-color: #a2a2a2;
 }
 
 @keyframes ani_loading {
