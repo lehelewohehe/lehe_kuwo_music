@@ -6,6 +6,7 @@ const env = readEnv('./.env.development');
 
 module.exports = webpackMerge.merge(baseConfig, {
   mode: "development",
+  devtool: "source-map",
   plugins:[
     new webpack.DefinePlugin({ // 定义环境和变量
       'process.env': {

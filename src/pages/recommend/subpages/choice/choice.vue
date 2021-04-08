@@ -1,10 +1,10 @@
 <template>
 <div class="p-choice">
   <div class="p-choice__banner">
-    <c-swiper :banner="bannerList"></c-swiper>
+    <c-swiper :banner="bannerList" v-loading="!bannerList.length"></c-swiper>
   </div>
   <c-choice-title title="个性推荐"></c-choice-title>
-  <div class="p-choice__singer">
+  <div class="p-choice__singer" v-loading="!songLists.length">
     <div class="p-choice__singer__item" 
     v-for="item in songLists" :key="item.id">
       <c-goods-box :avatar="item.picUrl" 
@@ -14,7 +14,7 @@
     </div>
   </div>
   <c-choice-title title="推荐电台"></c-choice-title>
-  <div class="p-choice__radio-station">
+  <div class="p-choice__radio-station" v-loading="!radioStations.length">
     <div class="p-choice__radio-station__item" 
     v-for="item in radioStations" :key="item.id">
       <c-goods-box :avatar="item.picUrl" 
@@ -23,7 +23,7 @@
     </div>
   </div>
   <c-choice-title title="最潮视频"></c-choice-title>
-  <div class="p-choice__mv">
+  <div class="p-choice__mv" v-loading="!newMvs.length">
     <div class="p-choice__mv__item" 
     v-for="item in newMvs" :key="item.id">
       <c-goods-box :avatar="item.cover" 
@@ -34,7 +34,7 @@
     </div>
   </div>
   <c-choice-title title="新碟上架"></c-choice-title>
-  <div class="p-choice__new-disc">
+  <div class="p-choice__new-disc" v-loading="!newDiscs.length">
     <div class="p-choice__new-disc__item" 
     v-for="item in newDiscs" :key="item.id">
       <c-goods-box :avatar="item.blurPicUrl" 
@@ -138,6 +138,7 @@ export default {
   &__radio-station,
   &__new-disc,
   &__mv {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;

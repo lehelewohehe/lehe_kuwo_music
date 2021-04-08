@@ -13,7 +13,7 @@
         <img @dragstart.prevent.stop
         @dragenter.prevent.stop
         @dragover.prevent.stop
-        :src="item.pic"></li>
+        v-lazy="item.pic"></li>
       </ul>
       <span class="next" @click="before" v-show="showArrow">
         <i class="iconfont iconyou"></i>

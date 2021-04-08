@@ -10,7 +10,8 @@
           <c-search></c-search>
         </div>
         <div class="p-app__scroll">
-          <div class="p-app__container" v-anchor="{right:'30px', bottom:'20px'}" v-scroll>
+          <div class="p-app__container" id="p-app__container"
+          v-anchor="{right:'30px', bottom:'20px'}" v-scroll>
             <router-view></router-view>
           </div>
         </div>

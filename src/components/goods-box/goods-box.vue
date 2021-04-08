@@ -1,7 +1,9 @@
 <template>
 <div class="c-goods-box">
   <div class="c-goods-box__wrapper" @click="goPage" :style="{padding: `${1/aspectRatio*50}% 0px`}">
-    <div class="c-goods-box__img" :style="`background-image: url(${avatar})`"></div>
+    <div class="c-goods-box__img">
+      <img v-lazy="avatar" alt="">
+    </div>
     <div class="c-goods-box__supplement" v-html="supplement"></div>
     <div class="c-goods-box__mask" :class="`${maskIconPos}`">
       <i class="iconfont" :class="`${maskIcon}`"></i>
@@ -95,6 +97,14 @@ export default {
     background-repeat: no-repeat;
     background-size: 100% auto;
     background-position: center;
+    img {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 100%;
+      height: 100%;
+      transform: translate(-50%, -50%);
+    }
   }
   &__supplement {
     position: absolute;
