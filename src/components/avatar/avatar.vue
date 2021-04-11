@@ -1,5 +1,5 @@
 <template>
-<div class="c-avatar" :style="{width: size, height: size}">
+<div class="c-avatar" :style="{width: size,height: size,borderRadius: fillet}">
   <div class="c-avatar__wrapper" 
   style="background-size: cover" 
   :style="{'background-image': `url(${src ? src : avatar})`}">
@@ -9,21 +9,23 @@
 
 <script type="text/javascript">
 import {ref} from "vue";
-import unloginAvatar from "@/assets/imgs/unlogin_avatar.jpg";
 export default {
   props: {
     src: {
       type: String,
-      default: unloginAvatar
+      default: ""
     },
     size: {
       type: String,
-      default: ""
+      default: "100%"
+    },
+    fillet: {
+      type: String,
+      default: "50%"
     }
   },
   setup(props, context) {
-    let avatar = ref(unloginAvatar);
-
+    let avatar = ref("");
     return {
       avatar
     }
@@ -32,7 +34,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .c-avatar {
-  border-radius: 50%;
   overflow: hidden;
   &__wrapper {
     width: 100%;

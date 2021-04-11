@@ -9,7 +9,8 @@
     v-for="item in songLists" :key="item.id">
       <c-goods-box :avatar="item.picUrl" 
       :title="item.name" 
-      :supplement="item.playCount" 
+      :supplement="item.playCount"
+      @click="$router.push({name: 'song-sheet_detail', params: {id: item.id}})"
       maskIconPos="right-bottom"></c-goods-box>
     </div>
   </div>

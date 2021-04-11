@@ -94,3 +94,8 @@ export function getNewMv(limit=5) {
 export function getNewDisc(limit=30) {
   return axios.get(`/top/album?limit=${limit}`);
 }
+
+// 获取歌单详情
+export function getSongSheetDetail(id) {
+  return axios.get(`/playlist/detail?id=${id}`);
+}

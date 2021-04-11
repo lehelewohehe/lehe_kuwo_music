@@ -2,7 +2,7 @@
 <div class="c-sidebar">
   <div class="c-sidebar__login" @click="onLogin">
     <div class="c-sidebar__avatar">
-      <c-avatar size="36px" :src="profile.avatarUrl"></c-avatar>
+      <c-avatar size="36px" :src="profile.avatarUrl || defaultAvatar"></c-avatar>
     </div>
     <div class="c-sidebar__nickname">{{profile.nickname || "点击登录"}}</div>
     <div class="c-sidebar__icon"></div>
@@ -24,12 +24,14 @@
 
 <script type="text/javascript">
 import {ref} from "vue";
+import unloginAvatar from "@/assets/imgs/unlogin_avatar.jpg";
 import {mapState, useStore, mapGetters} from "vuex";
 import {doLoginByCellPhone, quitLogin} from "@/request/index.js";
 import {createLoginWindow, toast} from "@/components/hook.js";
 export default {
   setup(props, context) {
     let store = useStore();
+    let defaultAvatar = ref(unloginAvatar);
     let sidebar = ref([
       {
         title: "",
@@ -157,7 +159,8 @@ export default {
       sidebar,
       onLogin,
       userList,
-      boxVisible
+      boxVisible,
+      defaultAvatar
     }
   },
   computed: {

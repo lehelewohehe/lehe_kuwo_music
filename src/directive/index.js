@@ -148,6 +148,7 @@ export function Lazy(app, options) {
   let {error, init} = options;
   let map = new Map();
   let boxRect = null;
+  let boxEl = null;
   let callback = throttle(function() {
     for(let item of map) {
       let img = item[0];
@@ -157,11 +158,12 @@ export function Lazy(app, options) {
       console.log(imgTop, img)
       if(imgTop - boxRect.top < boxRect.height) {
         img.src = src;
+        map.has(img) && map.delete(img);
       } 
     }
   }, 30);
   nextTick(() => {
-    let boxEl = document.getElementById("p-app__container");
+    boxEl = document.getElementById("p-app__container");
     boxRect = boxEl.getBoundingClientRect();
     boxEl.addEventListener("scroll", callback);
   });
@@ -174,7 +176,7 @@ export function Lazy(app, options) {
       callback();
     },
     beforeUnmount(el) {
-      boxEl.removeEventListener("scroll", callback);
+      // boxEl.removeEventListener("scroll", callback);
     }
   });
 }

@@ -80,6 +80,7 @@ export default {
   }
   &__left {
     width: 200px;
+    min-width: 200px;
     height: 100%;
     background-color: $color-bg-middle;
   }

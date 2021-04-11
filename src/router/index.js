@@ -43,6 +43,11 @@ const routes = [
       },
     ]
   },
+  {
+    path: "/song-sheet/:id",
+    name: "song-sheet_detail",
+    component: () => import("@/pages/recommend/subpages/song-sheet/detail.vue")
+  },
 ];
 
 // 3. 创建路由实例并传递 `routes` 配置

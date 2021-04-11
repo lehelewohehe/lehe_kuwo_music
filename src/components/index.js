@@ -12,6 +12,7 @@ import CInputTitle from "@/components/input-title/input-title.vue";
 import CUserBox from "@/components/user-box/user-box.vue";
 import CSwiper from "@/components/swiper/swiper.vue";
 import CGoodsBox from "@/components/goods-box/goods-box.vue";
+import CButton from "@/components/button/button.vue";
 
 const infos = [
   {name: "c-avatar", component: CAvatar},
@@ -26,7 +27,8 @@ const infos = [
   {name: "c-input-title", component: CInputTitle},
   {name: "c-user-box", component: CUserBox},
   {name: "c-swiper", component: CSwiper},
-  {name: "c-goods-box", component: CGoodsBox}
+  {name: "c-goods-box", component: CGoodsBox},
+  {name: "c-button", component: CButton},
 ]
 export default function(app, options) {
   infos.forEach((item) => {
