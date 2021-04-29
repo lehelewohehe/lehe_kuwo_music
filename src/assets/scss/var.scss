@@ -3,13 +3,23 @@ $color-main: #ffd200;
 // 颜色
 $color-bg-deep: #e8e8e8;
 $color-bg-middle: #f4f4f4;
-$color-bg-shallow: #fcfcfc;
+$color-bg-shallow: #fafafa;
 // 字体颜色
 $color-font-main: #323232;
 $color-font-gray: #a2a2a2;
 $color-font-deepgray: #676767;
 $color-font-white: #FFF;
 $color-font-black: #000;
+
+.color-font-main {
+  color: $color-font-main;
+}
+.color-font-gray {
+  color: $color-font-gray !important;
+}
+.color-font-deepgray {
+  color: $color-font-deepgray;
+}
 // 字体大小
 $font-size-xs: 12px;
 $font-size-s: 14px;

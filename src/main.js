@@ -9,9 +9,13 @@ import router from "@/router/index.js";
 import store from "@/store/index.js";
 import globalComponents from "@/components/index.js";
 import {JumpAnchor, ScrollBar, Loading, Lazy} from "@/directive/index.js";
+import ElementPlus from 'element-plus';
+import 'element-plus/lib/theme-chalk/index.css';
+import '@/assets/scss/element-variables.scss';
 
 // 5. 创建并挂载根实例
 const app = createApp(root);
+app.use(ElementPlus);
 // 确保 _use_ 路由实例使
 // 整个应用支持路由。
 app.use(router);

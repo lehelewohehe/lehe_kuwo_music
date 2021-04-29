@@ -99,3 +99,8 @@ export function getNewDisc(limit=30) {
 export function getSongSheetDetail(id) {
   return axios.get(`/playlist/detail?id=${id}`);
 }
+
+// 获取歌曲详情
+export function getSongDetail(ids) {
+  return axios.get(`/song/detail?ids=${ids}`);
+}
