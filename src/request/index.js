@@ -1,5 +1,6 @@
 import axios from "@/request/axios.js";
 import store from "@/store/index.js";
+import qs from "qs";
 import {createApp, toRefs} from "vue";
 let {cookie} = toRefs(store.state.user);
 // 下面用于测试cookie的响应式以及是否可以被监听
@@ -103,4 +104,10 @@ export function getSongSheetDetail(id) {
 // 获取歌曲详情
 export function getSongDetail(ids) {
   return axios.get(`/song/detail?ids=${ids}`);
+}
+
+// 获取歌单评论
+export function getSongComments(params) {
+  let str = qs.stringify(params);
+  return axios.get(`/comment/playlist?${str}`);
 }

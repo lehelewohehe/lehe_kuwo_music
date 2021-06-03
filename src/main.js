@@ -12,9 +12,11 @@ import {JumpAnchor, ScrollBar, Loading, Lazy} from "@/directive/index.js";
 import ElementPlus from 'element-plus';
 import 'element-plus/lib/theme-chalk/index.css';
 import '@/assets/scss/element-variables.scss';
+import dayjs from "dayjs";
 
 // 5. 创建并挂载根实例
 const app = createApp(root);
+app.config.globalProperties.$dayjs = dayjs;
 app.use(ElementPlus);
 // 确保 _use_ 路由实例使
 // 整个应用支持路由。

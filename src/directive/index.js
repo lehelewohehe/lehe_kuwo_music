@@ -131,7 +131,7 @@ export function Loading(app, options) {
       loadEl.classList.add("v-loading");
       loadEl.innerHTML = `<i class="iconfont iconloading"></i>`;
       mapEl.set(el, loadEl);
-      el.appendChild(mapEl.get(el));
+      el.appendChild(loadEl);
     },
     updated(el, binding) {
       if(!Boolean(binding.value)) {
