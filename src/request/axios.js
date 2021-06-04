@@ -38,8 +38,9 @@ const errorHandler = (error) => {
 instance.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
   let {method, params={}, data={}} = config;
-  params.timeStamp = Date.now();
+  params.timestamp = Date.now();
   config.params = params;
+  config.withCredentials = true;
   if(method.toLowerCase() == "post") {
     // let str = qs.stringify(params);
     // config.url += `?${str}`;
@@ -53,7 +54,7 @@ instance.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 instance.interceptors.response.use(function (response) {
-  console.log(response);
+  // console.log(response);
   const dataAxios = response.data;
   // 这个状态码是和后端约定的
   const { code } = dataAxios;

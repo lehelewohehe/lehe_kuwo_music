@@ -76,15 +76,70 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="评论" name="second">
+        <el-tag
+        v-if="!!replyParams.author"
+        closable
+        type="info"
+        @close="closeTag">
+        回复“{{replyParams.author}}”
+        </el-tag>
         <el-input
           type="textarea"
           resize="none"
           :rows="5"
           placeholder="请输入内容"
-          v-model="textarea">
+          v-model="replyParams.content">
         </el-input>
-        <div class="flex flex-main-end mt20 mb10"><c-button text="发表评论" bgColor="#ffd200"></c-button></div>
-        <el-card class="box-card" shadow="never">
+        <div class="flex flex-main-end mt20 mb10">
+          <c-button text="发表评论" bgColor="#ffd200" @click="sendComment"></c-button>
+        </div>
+        <el-card class="box-card" shadow="never" v-for="(item, index) in commentOptions">
+          <template #header>
+            <div class="card-header">
+              <span>{{item.name}}</span>
+            </div>
+          </template>
+          <div class="p-detail__comments">
+            <div class="p-detail__comments__item flex" v-for="(item, index) in (index==0?hotComments:comments)" :key="item.commentId">
+              <div class="p-detail__comments__left mr10">
+                <el-avatar :size="40" :src="item?.user?.avatarUrl"></el-avatar>
+              </div>
+              <div class="p-detail__comments__right flex flex-column flex-fill">
+                <div class="p-detail__comments__top flex flex-main-between flex-item-center">
+                  <div class="p-detail__comments__info">
+                    <div>{{item?.user?.nickname}}</div>
+                    <div class="mt5" style="color: #a2a2a2;">
+                      {{$dayjs(item.time).format('YYYY-MM-DD H:mm:ss')}}
+                    </div>
+                  </div>
+                  <div class="p-detail__comments__operator flex flex-main-between flex-item-center">
+                    <div class="flex flex-item-center">
+                      <i class="iconfont icondianzan pointer mr5" 
+                      :style="{color: item.liked?'rgb(255, 210, 0)':''}"
+                      @click="toggleLike(item.commentId, item.liked, item)"></i>
+                      <span>{{item.likedCount}}</span>
+                    </div>
+                    <span class="mlr20" style="display: inline-block;height: 20px;border: 1px solid #cacaca;box-sizing: border-box;"></span>
+                    <span class="pointer" style="color: #a2a2a2;" @click="replyComment(item.commentId, item?.user?.nickname)">回复</span>
+                  </div>
+                </div>
+                <div class="p-detail__comments__context mt10">{{item.content}}</div>
+              </div>
+            </div>
+            <div class="p-detail__comments__more flex-center">
+              <el-button round v-if="index==0">查看更多</el-button>
+              <el-pagination
+              v-else
+              background
+              layout="prev, pager, next"
+              :page-size="pageParams.pageSize"
+              v-model:current-page="pageParams.currentPage"
+              :total="pageParams.total">
+              </el-pagination>
+            </div>
+          </div>
+        </el-card>
+        <!-- <el-card class="box-card" shadow="never">
           <template #header>
             <div class="card-header">
               <span>最新评论</span>
@@ -100,22 +155,25 @@
                   <div class="p-detail__comments__info">
                     <div>{{item?.user?.nickname}}</div>
                     <div class="mt5" style="color: #a2a2a2;">
-                      {{$dayjs(item.time).format('YYYY-DD-MM H:mm:ss')}}
+                      {{$dayjs(item.time).format('YYYY-MM-DD H:mm:ss')}}
                     </div>
                   </div>
                   <div class="p-detail__comments__operator flex flex-main-between flex-item-center">
                     <div class="flex flex-item-center">
-                      <i class="iconfont icondianzan pointer mr5"></i><span>{{item.likedCount}}</span>
+                      <i class="iconfont icondianzan pointer mr5" :style="{color: item.liked?'rgb(255, 210, 0)':''}"></i><span>{{item.likedCount}}</span>
                     </div>
                     <span class="mlr20" style="display: inline-block;height: 20px;border: 1px solid #cacaca;box-sizing: border-box;"></span>
-                    <span class="pointer" style="color: #a2a2a2;">回复</span>
+                    <span class="pointer" style="color: #a2a2a2;" @click="replyComment(item.commentId, item?.user?.nickname)">回复</span>
                   </div>
                 </div>
                 <div class="p-detail__comments__context mt10">{{item.content}}</div>
               </div>
             </div>
+            <div class="p-detail__comments__more flex-center">
+              
+            </div>
           </div>
-        </el-card>
+        </el-card> -->
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -124,19 +182,43 @@
 
 <script type="text/javascript">
 import { useRouter, useRoute } from 'vue-router';
-import {getSongSheetDetail,getSongDetail, getSongComments} from "@/request/index.js";
-import {ref} from "vue";
+import {toast} from "@/components/hook.js";
+import {debounce} from "@/utils/utils.js";
+import {
+  getSongSheetDetail,
+  getSongDetail, 
+  getSongComments, 
+  sendComments, 
+  toggleLikeComment
+} from "@/request/index.js";
+import {ref, watch, reactive, nextTick} from "vue";
 export default {
   setup(props, context) {
     let activeName = ref('second');
     let textarea = ref("");
     let songSheetData = ref({});
     let comments = ref([]);
+    let hotComments = ref([]);
+    let commentOptions = ref([
+        {name: "热评"},
+        {name: "最新评论"}
+      ])
+    let pageParams = ref({
+      total: 0,
+      currentPage: 1,
+      pageSize: 20
+    });
+    let replyParams = ref({
+      commentId: null,
+      content: "",
+      author: ""
+    });
     const router = useRouter();
     const route = useRoute();
-    console.log(route);
+    const songSheetId = route.params.id;
 
-    getSongSheetDetail(route.params.id).then(data => {
+    // 获取歌单详情
+    getSongSheetDetail(songSheetId).then(data => {
       songSheetData.value = data.playlist;
       let ids = data.playlist.trackIds.map(item => {
         return item.id
@@ -145,25 +227,71 @@ export default {
         songSheetData.value.songs = res.songs;
       })
     });
+
+    // 切换tab的变化回调
     let handleClick = function(tab, event) {
       console.log(tab, event);
     }
+    // 回复评论
+    let replyComment = (function(id) {
+      let anchor;
+      return (id, nickname) =>{
+        replyParams.value.commentId = id;
+        replyParams.value.author = nickname;
+        anchor = anchor ? anchor : document.getElementById("v-anchor");
+        anchor.onclick();
+      };
+    })();
+    // 发送评论
+    let sendComment = function() {
+      let {commentId, content} = replyParams.value;
+      let t = commentId ? 2 : 1;
+      sendComments({t, type: 2, id: songSheetId, content, commentId}).then(res => {
+        toast({
+          message: "评论成功!",
+          icon: "iconzhuyi"
+        });
+        setTimeout(() =>{
+          moreComments();
+        }, 2000);
+      });
+    }
+    // 移除当前回复的人
+    let closeTag = function() {
+      replyParams.value.author='';
+      replyParams.value.commentId=null;
+      console.log(replyParams);
+    }
+    // 切换是否点赞
+    let toggleLike = debounce(function(cid, status, currentComment) {
+      console.log(cid, status, currentComment);
+      toggleLikeComment({cid, t: !status, type: 2, id: songSheetId}).then(res => {
+        console.log(res);
+        currentComment.liked = !status;
+        currentComment.likedCount += status ? -1 : 1;
+      });
+    }, 1000);
+    // 获取评论的方法封装
     let moreComments = (function() {
       let limit = 20,
-          page = 0,
           flag = true;
       return function() {
         if(flag) {
           flag = false;
-          getSongComments({limit, offset: limit * page, id: route.params.id}).then(res => {
-            page++;
-            comments.value = [...comments.value, ...res.comments];
+          getSongComments({limit, offset: limit * (pageParams.value.currentPage - 1), id: songSheetId}).then(res => {
+            pageParams.value.total = res.total;
+            hotComments.value = res.hotComments ? res.hotComments : hotComments.value;
+            comments.value = res.comments;
           }).finally(() => {
             flag = true;
           });
         }
       }
     })();
+    // 监听分页页码的变化
+    watch(()=>pageParams.value.currentPage, (val, preVal) => {
+      moreComments();
+    });
     moreComments();
 
     return {
@@ -172,7 +300,15 @@ export default {
       activeName,
       textarea,
       comments,
-      moreComments
+      hotComments,
+      moreComments,
+      replyComment,
+      sendComment,
+      pageParams,
+      replyParams,
+      closeTag,
+      commentOptions,
+      toggleLike
     }
   }
 }
@@ -220,6 +356,14 @@ export default {
     &__right {
       border-bottom: 1px solid #EBEEF5;
       padding-bottom: 14px;
+      overflow: hidden;
+    }
+    &__context {
+      white-space:normal; 
+      word-break:break-all;
+    }
+    &__more {
+      padding: 14px;
     }
   }
 }
@@ -252,5 +396,9 @@ export default {
 }
 :deep() .el-card__body {
   padding: 0px;
+}
+:deep() .el-button.is-round {
+  padding: 6px 12px;
+  min-height: inherit;
 }
 </style>

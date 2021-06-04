@@ -107,7 +107,17 @@ export function getSongDetail(ids) {
 }
 
 // 获取歌单评论
-export function getSongComments(params) {
+export function getSongComments(params={}) {
   let str = qs.stringify(params);
   return axios.get(`/comment/playlist?${str}`);
+}
+
+// 发布或者删除评论
+export function sendComments(data={}) {
+  return axios.post("/comment", data);
+}
+
+// 评论点赞
+export function toggleLikeComment(data={}) {
+  return axios.post("/comment/like", data);
 }

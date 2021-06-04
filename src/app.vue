@@ -88,6 +88,7 @@ export default {
     flex: 1 1 0;
     height: 100%;
     width: 100%;
+    overflow: hidden;
     background-color: #FFF;
     display: flex;
     flex-direction: column;

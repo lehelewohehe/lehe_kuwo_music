@@ -9,6 +9,7 @@ export function JumpAnchor(app, options) {
     // 当被绑定的元素挂载到 DOM 中时……
     mounted(el, binding) {
       anchor.className = "v-anchor";
+      anchor.id = "v-anchor";
       anchor.style.display = "none";
       anchor.innerHTML = `<i class="iconfont iconshang"></i>`;
       if(Object.prototype.toString.call(binding.value) == "[object Object]") {
