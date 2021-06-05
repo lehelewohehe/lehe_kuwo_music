@@ -1,5 +1,5 @@
 <template>
-<div class="c-login fixed-center" v-show="visible">
+<div class="c-login fixed-center z-index-2000" v-show="visible">
   <div class="c-login__qrcode" @click="onQrcodeLogin(true)">
     <i class="iconfont iconzujian-icon-18"></i>
   </div>
@@ -60,7 +60,7 @@
     </div>
     <div class="c-login__qrcode-page__title flex-center">手机扫码登录</div>
     <div class="c-login__qrcode-page__tip flex-center">使用<a target="_blank" href="https://music.163.com/#/download">网易云音乐App</a>扫描二维码</div>
-    <div class="c-login__qrcode-page__wrapper" :class="{active:!qr.timeout&&qr.authorized}">
+    <div class="c-login__qrcode-page__wrapper" :class="{active:!qr.timeout&&!qr.authorized}">
       <div class="c-login__qrcode-page__guide-img flex-center">我其实是一张图片，用于引导你如何操作，但是条件有限，凑合着看吧</div>
       <div class="c-login__qrcode-page__qrcode absolute-center">
         <img :src="qr.base64" alt="">

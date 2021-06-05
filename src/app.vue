@@ -7,6 +7,9 @@
       </div>
       <div class="p-app__right">
         <div class="p-app__toolbar">
+          <div class="p-app__toolbar__return pointer mr10" @click="$router.go(-1)">
+            <i class="iconfont iconzuo"></i>
+          </div>
           <c-search></c-search>
         </div>
         <div class="p-app__scroll">
@@ -100,6 +103,12 @@ export default {
     align-items: center;
     padding: 0px 30px;
     flex: 0 0 auto;
+    &__return {
+      .iconfont {
+        font-size: 24px;
+        color: #a2a2a2;
+      }
+    }
   }
   &__bottom {
     width: 100%;

@@ -1,5 +1,5 @@
 <template>
-<div class="c-user-box box-shadow" :style="$attrs.style" @click.stop>
+<div class="c-user-box box-shadow z-index-2000" :style="$attrs.style" @click.stop>
   <div class="c-user-box__wrapper">
     <div class="c-user-box__hd">
       <c-avatar :src="profile.avatarUrl" size="40px"></c-avatar>

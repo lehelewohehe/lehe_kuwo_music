@@ -102,15 +102,15 @@ module.exports = {
       stats: "errors-only",
       // 设置接口请求代理，更多 proxy 配置请参考 https://github.com/chimurai/http-proxy-middleware#options
       proxy: {
-          '/api/': {
-              changeOrigin: true,
-              // 目标地址
-              target: 'http://localhost:3000',
-              // 重写路径
-              pathRewrite: {
-                  '^/api/': '/'
-              }
+        '/api/': {
+          changeOrigin: true,
+          // 目标地址
+          target: 'http://localhost:3000',
+          // 重写路径
+          pathRewrite: {
+            '^/api/': '/'
           }
+        }
       }
   },
   plugins: [

@@ -46,6 +46,10 @@ li {
   cursor: pointer;
 }
 
+.z-index-2000 {
+  z-index: 2000;
+}
+
 .flex-center {
   display: flex;
   justify-content: center;

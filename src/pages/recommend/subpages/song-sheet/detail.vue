@@ -139,41 +139,6 @@
             </div>
           </div>
         </el-card>
-        <!-- <el-card class="box-card" shadow="never">
-          <template #header>
-            <div class="card-header">
-              <span>最新评论</span>
-            </div>
-          </template>
-          <div class="p-detail__comments">
-            <div class="p-detail__comments__item flex" v-for="(item, index) in comments" :key="item.commentId">
-              <div class="p-detail__comments__left mr10">
-                <el-avatar :size="40" :src="item?.user?.avatarUrl"></el-avatar>
-              </div>
-              <div class="p-detail__comments__right flex flex-column flex-fill">
-                <div class="p-detail__comments__top flex flex-main-between flex-item-center">
-                  <div class="p-detail__comments__info">
-                    <div>{{item?.user?.nickname}}</div>
-                    <div class="mt5" style="color: #a2a2a2;">
-                      {{$dayjs(item.time).format('YYYY-MM-DD H:mm:ss')}}
-                    </div>
-                  </div>
-                  <div class="p-detail__comments__operator flex flex-main-between flex-item-center">
-                    <div class="flex flex-item-center">
-                      <i class="iconfont icondianzan pointer mr5" :style="{color: item.liked?'rgb(255, 210, 0)':''}"></i><span>{{item.likedCount}}</span>
-                    </div>
-                    <span class="mlr20" style="display: inline-block;height: 20px;border: 1px solid #cacaca;box-sizing: border-box;"></span>
-                    <span class="pointer" style="color: #a2a2a2;" @click="replyComment(item.commentId, item?.user?.nickname)">回复</span>
-                  </div>
-                </div>
-                <div class="p-detail__comments__context mt10">{{item.content}}</div>
-              </div>
-            </div>
-            <div class="p-detail__comments__more flex-center">
-              
-            </div>
-          </div>
-        </el-card> -->
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -194,7 +159,7 @@ import {
 import {ref, watch, reactive, nextTick} from "vue";
 export default {
   setup(props, context) {
-    let activeName = ref('second');
+    let activeName = ref('first');
     let textarea = ref("");
     let songSheetData = ref({});
     let comments = ref([]);
@@ -217,6 +182,12 @@ export default {
     const route = useRoute();
     const songSheetId = route.params.id;
 
+    let obj = {name:"zq", age: 24};
+    let a = ref("a");
+    let b = ref(obj);
+    let c = reactive(obj);
+    console.log(a, b, c);
+
     // 获取歌单详情
     getSongSheetDetail(songSheetId).then(data => {
       songSheetData.value = data.playlist;
@@ -230,7 +201,7 @@ export default {
 
     // 切换tab的变化回调
     let handleClick = function(tab, event) {
-      console.log(tab, event);
+      // console.log(tab, event);
     }
     // 回复评论
     let replyComment = (function(id) {

@@ -1,5 +1,5 @@
 <template>
-<div class="c-option-box">
+<div class="c-option-box z-index-2000">
   <div class="c-option-box__wrapper">
     <div class="c-option-box__item" 
     v-for="(item, index) in options.list" :key="item.text"

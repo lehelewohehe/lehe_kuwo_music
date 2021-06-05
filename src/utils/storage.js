@@ -41,7 +41,7 @@ const mySession = {
     try {
       const value = sessionStorage.getItem(key);
       if (value === null || value === undefined || value === "") {
-          return null;
+         return null;
       }
       return JSON.parse(sessionStorage.getItem(key));
     } catch (err) {

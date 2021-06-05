@@ -30,9 +30,13 @@ export let createLoginWindow = (function() {
   let _obj = {visible: true};
   let container = null;
   return function(flag) {
-    if(_app && flag) {
-      _app.unmount(_app);
-      document.body.removeChild(container);
+    if(_app) {
+      if(flag) {
+        _app.unmount(_app);
+        document.body.removeChild(container);
+        _app = null;
+        container = null;
+      }
       return;
     }
     container = document.createElement("div");
@@ -50,9 +54,13 @@ export let createRegisterWindow = (function() {
   let _obj = {visible: true};
   let container = null;
   return function(flag) {
-    if(_app && flag) {
-      _app.unmount(_app);
-      document.body.removeChild(container);
+    if(_app) {
+      if(flag) {
+        _app.unmount(_app);
+        document.body.removeChild(container);
+        _app = null;
+        container = null;
+      }
       return;
     }
     container = document.createElement("div");

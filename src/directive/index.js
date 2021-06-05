@@ -154,9 +154,9 @@ export function Lazy(app, options) {
     for(let item of map) {
       let img = item[0];
       let src = item[1];
-      console.log(src, 123)
+      // console.log(src, 123)
       let {top: imgTop} = img.getBoundingClientRect();
-      console.log(imgTop, img)
+      // console.log(imgTop, img)
       if(imgTop - boxRect.top < boxRect.height) {
         img.src = src;
         map.has(img) && map.delete(img);
