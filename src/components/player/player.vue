@@ -4,8 +4,8 @@
     <div class="c-player__pre">
       <i class="iconfont iconshangyiqu"></i>
     </div>
-    <div class="c-player__switch">
-      <i class="iconfont iconbofang"></i>
+    <div class="c-player__switch" @click="switchPlayStatus">
+      <i class="iconfont" :class="isPlay?'iconbofang':'iconplayer-play-circle-fill'"></i>
     </div>
     <div class="c-player__next">
       <i class="iconfont iconxiayiqu"></i>
@@ -45,7 +45,7 @@
         </div>
       </div>
       <div class="c-player__progressbar">
-        <c-progress v-model:percent="signerPercent"></c-progress>
+        <c-progress v-model:percent="signerPercent" v-model:lock="progressLock"></c-progress>
       </div>
     </div>
   </div>
@@ -94,19 +94,31 @@
       <i class="iconfont icongedan"></i>
     </div>
   </div>
+  <audio
+  ref="audio"
+  :src="song.url" 
+  style="display: none"
+  autoplay
+  @play="onPlay"
+  @pause="onPause"
+  @ended="onEnded"
+  @timeupdate="onTimeupdate"
+  @durationchange="onDurationchange"></audio>
 </div>
 </template>
 
 <script type="text/javascript">
 import avatarImg from "@/assets/imgs/global_bg_01.jpg";
 import {toast} from "@/components/hook.js";
-import {ref} from "vue";
+import {ref, computed} from "vue";
+import {useStore} from "vuex";
 export default {
   setup(props, context) {
     let avatar = ref(avatarImg);
     let isCollect = ref(false);
     // 歌曲播放进度条百分比
     let signerPercent = ref(0);
+    let progressLock = ref(false);
     // 声音控制进度条百分比
     let voicePercent = ref(0);
     // 歌曲播放模式数据管理对象
@@ -132,6 +144,9 @@ export default {
       currentIndex: 0,
       isQuality: false
     });
+    let isPlay = ref(false);
+    let audio = ref(null);
+    const store = useStore();
 
     // 用于本地切换歌曲是否被收藏状态
     let onChangeCollect = function() {
@@ -151,17 +166,60 @@ export default {
     let onChangeQuality = function() {
       quality.value.isQuality = !quality.value.isQuality;
     }
+    // 开始播放事件回调
+    let onPlay = function(e) {
+      console.dir(audio.value);
+      isPlay.value = true;
+      console.log(e, "play");
+    }
+    // 播放暂停事件回调
+    let onPause = function(e) {
+      isPlay.value = false;
+      console.log(e, "pause");
+    }
+    // 播放结束事件回调
+    let onEnded = function(e) {
+      isPlay.value = false;
+      console.log(e, "end");
+    }
+    // 播放进度改变
+    let onDurationchange = function(e) {
+      console.log(e, "change");
+    }
+    // currentTime 变化事件回调
+    let onTimeupdate = function(e) {
+      let {currentTime, duration} = audio.value;
+      if(!progressLock.value) {
+        signerPercent.value = currentTime / duration * 100;
+      } 
+      console.log(e, "update", currentTime);
+    }
+    // 切换播放状态
+    let switchPlayStatus = function() {
+      isPlay.value ? audio.value.pause() : audio.value.play();
+      isPlay.value = !isPlay.value;
+    }
 
     return {
       avatar,
       signerPercent,
+      progressLock,
       voicePercent,
       isCollect,
+      isPlay,
       onChangeCollect,
       onChangeMode,
       mode,
       onChangeQuality,
-      quality
+      quality,
+      song: computed(() => store.state.player.currentPlaySong),
+      audio,
+      onPlay,
+      onPause,
+      onEnded,
+      onTimeupdate,
+      onDurationchange,
+      switchPlayStatus
     }
   }
 }

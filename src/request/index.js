@@ -121,3 +121,9 @@ export function sendComments(data={}) {
 export function toggleLikeComment(data={}) {
   return axios.post("/comment/like", data);
 }
+
+// 获取音乐url
+export function getSongUrl(ids) {
+  ids = typeof ids == "object" ? ids.join() : ids;
+  return axios.get(`/song/url?id=${ids}`);
+}

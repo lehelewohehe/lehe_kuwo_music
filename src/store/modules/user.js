@@ -1,5 +1,6 @@
 import {timeLocal} from "@/utils/storage.js";
 export default {
+  namespaced: true,
   state: {
     profile: timeLocal.get(timeLocal.keys["LEHET_PROFILE"]) || {},
     token: timeLocal.get(timeLocal.keys["LEHET_TOKEN"]) || "",

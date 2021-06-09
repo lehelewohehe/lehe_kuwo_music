@@ -23,7 +23,7 @@
 </template>
 
 <script type="text/javascript">
-import {ref} from "vue";
+import {ref, computed} from "vue";
 import unloginAvatar from "@/assets/imgs/unlogin_avatar.jpg";
 import {mapState, useStore, mapGetters} from "vuex";
 import {doLoginByCellPhone, quitLogin} from "@/request/index.js";
@@ -31,6 +31,7 @@ import {createLoginWindow, toast} from "@/components/hook.js";
 export default {
   setup(props, context) {
     let store = useStore();
+    let isLogin = computed(() => store.getters["user/isLogin"]);
     let defaultAvatar = ref(unloginAvatar);
     let sidebar = ref([
       {
@@ -115,10 +116,11 @@ export default {
       });
       target.active = true;
     }
+    console.log(store, 123321);
     // 登录
     let onLogin = function() {
       // 已登录
-      if(store.getters.isLogin) {
+      if(isLogin.value) {
         boxVisible.value = !boxVisible.value;
       }else {
         createLoginWindow()
@@ -145,7 +147,7 @@ export default {
             toast({
               message: "退出成功"
             });
-            store.commit("setLoginInfo", {});
+            store.commit("user/setLoginInfo", {});
           });
         } break;
         default: ;
@@ -160,14 +162,10 @@ export default {
       onLogin,
       userList,
       boxVisible,
-      defaultAvatar
+      defaultAvatar,
+      isLogin,
+      profile: computed(() => store.state.user.profile)
     }
-  },
-  computed: {
-    ...mapState({
-      profile: state => state.user.profile
-    }),
-    ...mapGetters(["isLogin"])
   }
 }
 </script>

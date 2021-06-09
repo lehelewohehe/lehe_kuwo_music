@@ -83,11 +83,19 @@ export default {
       default: () => {
         return {};
       }
+    },
+    lock: {
+      type: Boolean,
+      default: false
     }
   },
   emits: {
-    "update:percent": paload => {
-      console.log(paload, "update:percent");
+    "update:percent": payload => {
+      console.log(payload, "update:percent");
+      return true;
+    },
+    "update:lock": payload => {
+      console.log(payload, "update:lock");
       return true;
     }
   },
@@ -142,6 +150,7 @@ export default {
       console.log(e, "end");
       document.removeEventListener("mousemove", onDrapMove);
       document.removeEventListener("mouseup", onDrapEnd);
+      emit("update:lock", false);
     }
 
     // 进度条滑动初始化
@@ -151,6 +160,7 @@ export default {
       startY = pageY;
       document.addEventListener("mousemove", onDrapMove);
       document.addEventListener("mouseup", onDrapEnd);
+      emit("update:lock", true);
     }
     // 设置tooltip出现并且设置出现的位置 节流包装
     let onShowTooltip = throttle(function(e) {

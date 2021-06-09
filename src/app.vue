@@ -41,7 +41,7 @@ export default {
     let store = useStore();
     getLoginStatus().then(data => {
       let {code, profile} = data.data;
-      store.commit("setProfile", {profile});
+      store.commit("user/setProfile", {profile});
       if(!profile) {
         timeLocal.remove(timeLocal.keys["LEHET_COOKIE"]);
         timeLocal.remove(timeLocal.keys["LEHET_TOKEN"]);

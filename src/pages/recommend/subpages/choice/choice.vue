@@ -69,9 +69,6 @@ export default {
   components: {
     CChoiceTitle
   },
-  computed: {
-    ...mapGetters(["isLogin"])
-  },
   setup(props, context) {
     let bannerList = ref([]);
     let songLists = ref([]);

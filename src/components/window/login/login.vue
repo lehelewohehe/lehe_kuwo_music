@@ -181,13 +181,13 @@ export default {
               qr.value.authorized = true;
             } break;
             case 803: {
-              store.commit("setCookie", {cookie: data.cookie})
+              store.commit("user/setCookie", {cookie: data.cookie})
               toast({message: "授权登录成功"});
               createLoginWindow(true);
               clearInterval(qr.value.timeId);
               getLoginStatus().then(data => {
                 let {code, profile} = data.data;
-                store.commit("setProfile", {profile});
+                store.commit("user/setProfile", {profile});
                 if(code !== 200) {
                   timeLocal.remove(timeLocal.keys["LEHET_COOKIE"]);
                   timeLocal.remove(timeLocal.keys["LEHET_TOKEN"]);
@@ -240,7 +240,7 @@ export default {
           if(code !== 200) {
             toast({message});
           } else {
-            store.commit("setLoginInfo", data);
+            store.commit("user/setLoginInfo", data);
             createLoginWindow(true);
             toast({message: "登录成功"});
             form.value.isRemmenber ? 

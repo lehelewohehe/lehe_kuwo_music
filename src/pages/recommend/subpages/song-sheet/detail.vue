@@ -47,7 +47,7 @@
           prop="name"
           label="歌名">
             <template #default="scope">
-              <div class="text-ellipsis active-hover">{{scope.row.name}}</div>
+              <div @click="setCurrentPlaySong(scope.row)" class="text-ellipsis active-hover">{{scope.row.name}}</div>
             </template>
           </el-table-column>
           <el-table-column width="200">
@@ -157,6 +157,7 @@ import {
   toggleLikeComment
 } from "@/request/index.js";
 import {ref, watch, reactive, nextTick} from "vue";
+import {useStore} from "vuex";
 export default {
   setup(props, context) {
     let activeName = ref('first');
@@ -178,15 +179,21 @@ export default {
       content: "",
       author: ""
     });
+    // 路由相关
     const router = useRouter();
     const route = useRoute();
     const songSheetId = route.params.id;
 
-    let obj = {name:"zq", age: 24};
-    let a = ref("a");
-    let b = ref(obj);
-    let c = reactive(obj);
-    console.log(a, b, c);
+    // vuex相关
+    const store = useStore();
+    // 设置当前播放的歌曲
+    let setCurrentPlaySong = function({id}) {
+      console.log(store, id)
+      return store.dispatch({
+        type: 'player/setCurrentPlaySong',
+        ids: id
+      });
+    }
 
     // 获取歌单详情
     getSongSheetDetail(songSheetId).then(data => {
@@ -279,7 +286,8 @@ export default {
       replyParams,
       closeTag,
       commentOptions,
-      toggleLike
+      toggleLike,
+      setCurrentPlaySong
     }
   }
 }
