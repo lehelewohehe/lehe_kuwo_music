@@ -116,7 +116,7 @@ export default {
       });
       target.active = true;
     }
-    console.log(store, 123321);
+    // console.log(store, 123321);
     // 登录
     let onLogin = function() {
       // 已登录

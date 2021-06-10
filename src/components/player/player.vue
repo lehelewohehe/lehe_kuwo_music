@@ -5,7 +5,7 @@
       <i class="iconfont iconshangyiqu"></i>
     </div>
     <div class="c-player__switch" @click="switchPlayStatus">
-      <i class="iconfont" :class="isPlay?'iconbofang':'iconplayer-play-circle-fill'"></i>
+      <i class="iconfont" :class="!isPlay?'iconbofang':'iconplayer-play-circle-fill'"></i>
     </div>
     <div class="c-player__next">
       <i class="iconfont iconxiayiqu"></i>
@@ -19,9 +19,9 @@
         <div class="c-player__singer-info__name">Promise</div>
         <div class="c-player__singer-info__right">
           <div class="c-player__singer-info__time">
-            <div class="c-player__singer-info__now">{{signerPercent}}</div>
+            <div class="c-player__singer-info__now">{{singerCurrentTime}}</div>
             <span style="margin: 0px 2px;">/</span>
-            <div class="c-player__singer-info__all">3:40</div>
+            <div class="c-player__singer-info__all">{{singerEndTime}}</div>
           </div>
           <div class="c-player__singer-info__quality" @click="onChangeQuality">
             <span>{{quality.list[quality.currentIndex].text.substr(0, 2)}}</span>
@@ -45,7 +45,7 @@
         </div>
       </div>
       <div class="c-player__progressbar">
-        <c-progress v-model:percent="signerPercent" v-model:lock="progressLock"></c-progress>
+        <c-progress v-model:percent="signerPercent" v-model:lock="progressLock" @jump="onJump" :max="allTime"></c-progress>
       </div>
     </div>
   </div>
@@ -70,7 +70,7 @@
       </c-option-box>
     </div>
     <div class="c-player__voice-control flex-center">
-      <i class="iconfont iconVoice"></i>
+      <i :class="`iconfont ${!!voicePercent?'iconVoice':'iconjingyin'}`" @click="toggleVoiceStatus"></i>
       <div class="c-player__voice-control__box">
         <c-progress class="c-player__voice-control__progress" 
         v-model:percent="voicePercent" vertical></c-progress>
@@ -110,7 +110,7 @@
 <script type="text/javascript">
 import avatarImg from "@/assets/imgs/global_bg_01.jpg";
 import {toast} from "@/components/hook.js";
-import {ref, computed} from "vue";
+import {ref, computed, getCurrentInstance, watch} from "vue";
 import {useStore} from "vuex";
 export default {
   setup(props, context) {
@@ -119,8 +119,11 @@ export default {
     // 歌曲播放进度条百分比
     let signerPercent = ref(0);
     let progressLock = ref(false);
+    let singerCurrentTime = ref("--:--");
+    let singerEndTime = ref("--:--");
+    let allTime = ref(0);
     // 声音控制进度条百分比
-    let voicePercent = ref(0);
+    let voicePercent = ref(100);
     // 歌曲播放模式数据管理对象
     let mode = ref({
       list: [
@@ -146,6 +149,8 @@ export default {
     });
     let isPlay = ref(false);
     let audio = ref(null);
+    let instance = getCurrentInstance();
+    let $dayjs = instance.appContext.config.globalProperties.$dayjs;
     const store = useStore();
 
     // 用于本地切换歌曲是否被收藏状态
@@ -168,8 +173,11 @@ export default {
     }
     // 开始播放事件回调
     let onPlay = function(e) {
-      console.dir(audio.value);
+      let {duration} = audio.value;
+      let time = $dayjs(duration * 1000);
+      allTime.value = duration;
       isPlay.value = true;
+      singerEndTime.value = `${time.minute()}:${time.second()}`;
       console.log(e, "play");
     }
     // 播放暂停事件回调
@@ -191,8 +199,9 @@ export default {
       let {currentTime, duration} = audio.value;
       if(!progressLock.value) {
         signerPercent.value = currentTime / duration * 100;
-      } 
-      console.log(e, "update", currentTime);
+      }
+      let time = $dayjs(currentTime * 1000);
+      singerCurrentTime.value = `${time.minute()}:${time.second()}`;
     }
     // 切换播放状态
     let switchPlayStatus = function() {
@@ -200,11 +209,41 @@ export default {
       isPlay.value = !isPlay.value;
     }
 
+    // 歌曲进度跳转功能回调
+    let onJump = function() {
+      let {paused, duration} = audio.value;
+      audio.value.currentTime = signerPercent.value * duration / 100;
+      paused ? audio.value.play() : "";
+    }
+
+    // 切换静音状态
+    let toggleVoiceStatus = (function() {
+      let pre = 0;
+      return function() {
+        if(!!voicePercent.value) {
+          pre = voicePercent.value;
+          voicePercent.value = 0;
+          audio.value.muted = true;
+        } else {
+          voicePercent.value = pre;
+          audio.value.muted = false;
+        }
+      }
+    })();
+    // 监听音量进度条变化改变音量
+    watch(voicePercent, () => {
+      audio.value.volume = voicePercent.value / 100;
+    });
+
     return {
       avatar,
+      allTime,
       signerPercent,
+      singerCurrentTime,
+      singerEndTime,
       progressLock,
       voicePercent,
+      toggleVoiceStatus,
       isCollect,
       isPlay,
       onChangeCollect,
@@ -214,6 +253,7 @@ export default {
       quality,
       song: computed(() => store.state.player.currentPlaySong),
       audio,
+      onJump,
       onPlay,
       onPause,
       onEnded,

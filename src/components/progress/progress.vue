@@ -97,6 +97,10 @@ export default {
     "update:lock": payload => {
       console.log(payload, "update:lock");
       return true;
+    },
+    "jump": payload => {
+      console.log(payload, "jump");
+      return true;
     }
   },
   setup(props, context) {
@@ -117,12 +121,16 @@ export default {
     let getCircleStyle = computed(reduce(circleStyle));
     let getProgressStyle = computed(reduce(progressStyle));
     let getTooltip = computed(reduce(tooltip));
+    let instance = getCurrentInstance();
+    let $dayjs = instance.appContext.config.globalProperties.$dayjs;
     // 监听percent，同步其他数据变化
     watch(percent, () => {
-      nextTick(() => {
-        tooltipLeft.value = inner.value.offsetWidth;
-      });
-      defaultText.value = Math.ceil(percent.value * max.value / 100);
+      // nextTick(() => {
+      //   tooltipLeft.value = inner.value.offsetWidth;
+      // });
+      // let progressHoverValue = Math.ceil(percent.value * max.value / 100);
+      // defaultText.value = vertical ? progressHoverValue
+      // : `${$dayjs(progressHoverValue * 1000).minute()}:${$dayjs(progressHoverValue * 1000).second()}`;
     }, {immediate: true});
 
     // console.log(getProgressStyle.value, getCircleStyle.value);
@@ -132,6 +140,7 @@ export default {
       // console.log(e, outer.value.offsetWidth, offsetX);
       // console.log(Number((offsetX / outer.value.offsetWidth * 100).toFixed(2)));
       emit("update:percent", Number((offsetX / outer.value.offsetWidth * 100).toFixed(2)));
+      emit("jump");
     }
     
     // 进度条滑动 节流包装
@@ -151,6 +160,7 @@ export default {
       document.removeEventListener("mousemove", onDrapMove);
       document.removeEventListener("mouseup", onDrapEnd);
       emit("update:lock", false);
+      emit("jump");
     }
 
     // 进度条滑动初始化
@@ -175,7 +185,9 @@ export default {
       }
       tooltipLeft.value = tooltipLeft.value < 0 ? 0 : tooltipLeft.value;
       tooltipLeft.value = tooltipLeft.value < _offsetWidth ? tooltipLeft.value : _offsetWidth;
-      defaultText.value = Math.floor(tooltipLeft.value / _offsetWidth * max.value);
+      let progressHoverValue = Math.floor(tooltipLeft.value / _offsetWidth * max.value);
+      defaultText.value = vertical.value ? progressHoverValue
+      : `${$dayjs(progressHoverValue * 1000).minute()}:${$dayjs(progressHoverValue * 1000).second()}`;
     }, 10);
 
     return {
