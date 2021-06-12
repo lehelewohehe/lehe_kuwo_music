@@ -12,11 +12,14 @@
     </div>
   </div>
   <div class="c-player__info">
-    <div class="c-player__cover" :style="{'background-image': `url(${avatar})`}">
+    <div class="c-player__cover" :style="{'background-image': `url(${songDetail?.al?.picUrl})`}">
+      <div class="c-player__arrow flex-center">
+        <i class="iconfont iconshuangjiantoushang"></i>
+      </div>
     </div>
     <div class="c-player__progress">
       <div class="c-player__singer-info">
-        <div class="c-player__singer-info__name">Promise</div>
+        <div class="c-player__singer-info__name">{{songDetail.name}}</div>
         <div class="c-player__singer-info__right">
           <div class="c-player__singer-info__time">
             <div class="c-player__singer-info__now">{{singerCurrentTime}}</div>
@@ -99,6 +102,7 @@
   :src="song.url" 
   style="display: none"
   autoplay
+  :loop="mode.currentIndex == 1"
   @play="onPlay"
   @pause="onPause"
   @ended="onEnded"
@@ -108,13 +112,11 @@
 </template>
 
 <script type="text/javascript">
-import avatarImg from "@/assets/imgs/global_bg_01.jpg";
 import {toast} from "@/components/hook.js";
 import {ref, computed, getCurrentInstance, watch} from "vue";
 import {useStore} from "vuex";
 export default {
   setup(props, context) {
-    let avatar = ref(avatarImg);
     let isCollect = ref(false);
     // 歌曲播放进度条百分比
     let signerPercent = ref(0);
@@ -152,6 +154,9 @@ export default {
     let instance = getCurrentInstance();
     let $dayjs = instance.appContext.config.globalProperties.$dayjs;
     const store = useStore();
+    // 获取当前播放的歌曲信息
+    let song = computed(() => store.state.player.currentPlaySong);
+    let songDetail = computed(() => store.state.player.currentPlayDetail);
 
     // 用于本地切换歌曲是否被收藏状态
     let onChangeCollect = function() {
@@ -212,6 +217,7 @@ export default {
     // 歌曲进度跳转功能回调
     let onJump = function() {
       let {paused, duration} = audio.value;
+      if(Object.is(duration,duration) && duration != duration) return;
       audio.value.currentTime = signerPercent.value * duration / 100;
       paused ? audio.value.play() : "";
     }
@@ -232,11 +238,11 @@ export default {
     })();
     // 监听音量进度条变化改变音量
     watch(voicePercent, () => {
+      console.log(songDetail.value);
       audio.value.volume = voicePercent.value / 100;
     });
 
     return {
-      avatar,
       allTime,
       signerPercent,
       singerCurrentTime,
@@ -251,7 +257,8 @@ export default {
       mode,
       onChangeQuality,
       quality,
-      song: computed(() => store.state.player.currentPlaySong),
+      song,
+      songDetail,
       audio,
       onJump,
       onPlay,
@@ -266,6 +273,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .c-player {
+  position: relative;
+  z-index: 2001;
   display: flex;
   justify-content: flex-start;
   height: 100%;
@@ -300,6 +309,21 @@ export default {
     height: 100%;
     background-size: cover;
     cursor: pointer;
+    background-color: $color-bg-middle;
+  }
+  &__arrow {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+    transition: opacity 0.3s ease;
+    .iconfont {
+      font-size: 30px;
+      color: $color-font-gray;
+    }
+    &:hover {
+      opacity: 1;
+    }
   }
   &__progress {
     flex: 1 1 0;

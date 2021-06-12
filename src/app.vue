@@ -25,6 +25,7 @@
         <c-player></c-player>
       </div>
     </div>
+    <c-fullscreen-player></c-fullscreen-player>
   </div>
 </div>
 </template>
@@ -66,6 +67,7 @@ export default {
   background-size: cover;
   color: $color-font-main;
   &__wrapper {
+    position: relative;
     width: 1010px;
     height: 630px;
     background: pink;

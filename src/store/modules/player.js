@@ -2,7 +2,8 @@ import {getSongUrl} from "@/request/index.js";
 export default {
   namespaced: true,
   state: {
-    currentPlaySong: {}
+    currentPlaySong: {},
+    currentPlayDetail: {}
   },
   getters: {
 
@@ -10,22 +11,19 @@ export default {
   mutations: {
     setCurrentPlaySong(state, payload) {
       state.currentPlaySong = payload.currentPlaySong;
+    },
+    setCurrentPlayDetail(state, payload) {
+      state.currentPlayDetail = payload.currentPlayDetail;
     }
   },
   actions: {
-    setCurrentPlaySong({commit}, payload) {
+    setCurrentPlay({commit}, payload) {
       console.log(payload)
-      let {song, ids} = payload;
-      song ? 
-      commit({
-          type: "setCurrentPlaySong",
-          currentPlaySong: song
-        }) : 
-      getSongUrl(ids).then(res => {
-        commit({
-          type: "setCurrentPlaySong",
-          currentPlaySong: res.data[0]
-        });
+      let {currentPlayDetail={}} = payload;
+      let {id} = currentPlayDetail; 
+      getSongUrl(id).then(res => {
+        commit({type: "setCurrentPlaySong",currentPlaySong: res.data[0]});
+        commit({type: "setCurrentPlayDetail",currentPlayDetail});
       }).catch(error => {
         console.log(error);
       })

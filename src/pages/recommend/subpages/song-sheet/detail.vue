@@ -187,11 +187,11 @@ export default {
     // vuex相关
     const store = useStore();
     // 设置当前播放的歌曲
-    let setCurrentPlaySong = function({id}) {
-      console.log(store, id)
+    let setCurrentPlaySong = function(currentPlayDetail) {
+      console.log(store)
       return store.dispatch({
-        type: 'player/setCurrentPlaySong',
-        ids: id
+        type: "player/setCurrentPlay",
+        currentPlayDetail
       });
     }
 
