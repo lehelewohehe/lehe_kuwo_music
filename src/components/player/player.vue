@@ -12,9 +12,9 @@
     </div>
   </div>
   <div class="c-player__info">
-    <div class="c-player__cover" :style="{'background-image': `url(${songDetail?.al?.picUrl})`}">
+    <div class="c-player__cover" :style="{'background-image': `url(${songDetail?.al?.picUrl})`}" @click="switchFullscreen">
       <div class="c-player__arrow flex-center">
-        <i class="iconfont iconshuangjiantoushang"></i>
+        <i :class="`iconfont ${isFullscreen?'iconshuangjiantou-xia':'iconshuangjiantoushang'}`"></i>
       </div>
     </div>
     <div class="c-player__progress">
@@ -117,6 +117,7 @@ import {ref, computed, getCurrentInstance, watch} from "vue";
 import {useStore} from "vuex";
 export default {
   setup(props, context) {
+    let {emit} = context;
     let isCollect = ref(false);
     // 歌曲播放进度条百分比
     let signerPercent = ref(0);
@@ -124,6 +125,7 @@ export default {
     let singerCurrentTime = ref("--:--");
     let singerEndTime = ref("--:--");
     let allTime = ref(0);
+    let isFullscreen = ref(false);
     // 声音控制进度条百分比
     let voicePercent = ref(100);
     // 歌曲播放模式数据管理对象
@@ -222,6 +224,13 @@ export default {
       paused ? audio.value.play() : "";
     }
 
+    // 切换全屏播放
+    let switchFullscreen = function() {
+      if(!song.value.url) return;
+      isFullscreen.value = !isFullscreen.value;
+      emit('switchFullscreen', isFullscreen.value);
+    }
+
     // 切换静音状态
     let toggleVoiceStatus = (function() {
       let pre = 0;
@@ -252,6 +261,7 @@ export default {
       toggleVoiceStatus,
       isCollect,
       isPlay,
+      isFullscreen,
       onChangeCollect,
       onChangeMode,
       mode,
@@ -266,7 +276,8 @@ export default {
       onEnded,
       onTimeupdate,
       onDurationchange,
-      switchPlayStatus
+      switchPlayStatus,
+      switchFullscreen
     }
   }
 }
@@ -308,6 +319,8 @@ export default {
     width: 60px;
     height: 100%;
     background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     cursor: pointer;
     background-color: $color-bg-middle;
   }

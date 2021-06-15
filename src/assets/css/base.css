@@ -263,3 +263,12 @@ li {
     transform: rotate(360deg);
   }
 }
+
+@keyframes bg-emerge-gradually {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

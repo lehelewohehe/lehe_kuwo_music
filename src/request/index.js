@@ -127,3 +127,13 @@ export function getSongUrl(ids) {
   ids = typeof ids == "object" ? ids.join() : ids;
   return axios.get(`/song/url?id=${ids}`);
 }
+
+// 获取歌词
+export function getSongLyric(id) {
+  return axios.get(`/lyric?id=${id}`);
+}
+
+// 获取MV地址
+export function getSongMV(id) {
+  return axios.get(`/mv/url?id=${id}`);
+}

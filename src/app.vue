@@ -22,10 +22,10 @@
     </div>
     <div class="p-app__bottom">
       <div class="p-app__player">
-        <c-player></c-player>
+        <c-player @switchFullscreen="switchFullscreen"></c-player>
       </div>
     </div>
-    <c-fullscreen-player></c-fullscreen-player>
+    <c-fullscreen-player v-show="isFullscreen"></c-fullscreen-player>
   </div>
 </div>
 </template>
@@ -40,6 +40,7 @@ export default {
   setup(props, context) {
     let globalBg = ref(globalBgImg);
     let store = useStore();
+    let isFullscreen = ref(false);
     getLoginStatus().then(data => {
       let {code, profile} = data.data;
       store.commit("user/setProfile", {profile});
@@ -50,8 +51,14 @@ export default {
       }
     });
 
+    let switchFullscreen = function(flag) {
+      isFullscreen.value = flag;
+    }
+
     return {
-      globalBg
+      globalBg,
+      isFullscreen,
+      switchFullscreen
     }
   }
 }
