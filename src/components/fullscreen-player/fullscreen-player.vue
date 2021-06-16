@@ -28,7 +28,7 @@
 </template>
 
 <script type="text/javascript">
-import {ref, computed, onBeforeUnmount} from "vue";
+import {ref, computed, onUnmounted, nextTick} from "vue";
 import {useStore} from "vuex";
 import {parseLyric} from "@/utils/utils.js";
 export default {
@@ -50,17 +50,24 @@ export default {
     let audio = document.getElementById("audio");
     // 计算当前是第几行
     let calcCurrentRow = function() {
+      let {currentTime} = audio;
       for(let i = 0; i < lyricArr.value.length; i++) {
-        let {currentTime} = audio;
+        if(currentTime < lyricArr.value[0].time) {
+          currentRow.value = 0;
+          break;
+        } 
         if(i == (lyricArr.value.length - 1)) {
           currentRow.value = i;
           break;
         }
-        if(lyricArr.value[i].time <= currentTime && lyricArr.value[i+1].time >= currentTime) {
+        if(currentTime >= lyricArr.value[i].time && currentTime <= lyricArr.value[i+1].time){
           currentRow.value = i;
           break;
         }
       }
+      nextTick(() => {
+        lyricRef.value.scrollTop = currentRow.value * lyricItem.value.clientHeight;
+      });
     };
     calcCurrentRow();
 
@@ -75,21 +82,23 @@ export default {
       }
       showOptions.value[index].flag = true;
     }
-
+    console.log(lyricArr.value);
     // 歌曲播放进度变化事件回调
     let onTimeupdate = function(e) {
       let {currentTime, duration} = audio;
-      console.log(lyricItem.value.innerText);
-      console.log(currentRow.value);
-      if(currentRow.value >= lyricArr.value.length - 2) {
-        currentRow.value = currentTime == duration ? 0 : currentRow.value;
-        return;
-      }
-      if(currentTime >= lyricArr.value[currentRow.value+1].time && currentTime <= lyricArr.value[currentRow.value+2].time) {
+      // console.log(lyricItem.value.innerText);
+      console.log(currentRow.value, currentTime);
+      let cur = lyricArr.value[currentRow.value]?.time;
+      let next = lyricArr.value[currentRow.value+1]?.time;
+      let nnext = lyricArr.value[currentRow.value+2]?.time;
+      let flag = cur && next && nnext;
+      if(flag && currentTime >= next && currentTime <= nnext) {
         currentRow.value += 1;
         lyricRef.value.scrollTop = currentRow.value * lyricItem.value.clientHeight;
-      } else if(currentTime >= lyricArr.value[currentRow.value].time && currentTime < lyricArr.value[currentRow.value+1].time) {
+      } else if(flag && currentTime >= cur && currentTime < next) {
         return;
+      } else if(currentTime == duration) {
+        currentRow.value = lyricArr.value.length - 1;
       } else {
         calcCurrentRow();
       }
@@ -97,7 +106,7 @@ export default {
     audio.addEventListener("timeupdate", onTimeupdate);
 
     // 组件销毁时回收资源
-    onBeforeUnmount(() => {
+    onUnmounted(() => {
       audio.removeEventListener("timeupdate", onTimeupdate);
     });
     
@@ -198,12 +207,13 @@ export default {
     color: #FFF;
     font-size: 16px;
     box-sizing: border-box;
-    padding-top: 20%;
+    padding: 20% 0px;
     &__item {
       &.active {
         color: rgb(255, 210, 0);
       }
       line-height: 40px;
+      height: 40px;
       text-align: center;
     }
   }
