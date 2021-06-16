@@ -37,3 +37,20 @@ export const reduce = (style) => {
     }, "");
   }
 }
+
+// 格式化歌词
+export const parseLyric = function(lyric) {
+  // console.log(lyric);
+  let rowArr = lyric.split(/\cJ/g);
+  let lyricArr = [];
+  rowArr.forEach(row => {
+    if(!row) return;
+    row = row.slice(1);
+    let arr = row.split("]");
+    let numArr = arr[0].split(":");
+    lyricArr.push({time: Number((Number(numArr[0])*60+Number(numArr[1])).toFixed(3)), text: arr[1]});
+    // console.log(arr, numArr);
+  });
+  // console.log(lyricObj);
+  return lyricArr;
+}

@@ -3,11 +3,23 @@
   <div class="c-fullscreen-player__wrapper" :style="{'background-image': `url(${songDetail?.al?.picUrl})`}">
     <div class="c-fullscreen-player__mask"></div>
     <div class="c-fullscreen-player__container">
-      <div class="c-fullscreen-player__tabs" @click="switchTabs">
-        <div class="c-fullscreen-player__tabs__wrapper">
-          <div class="c-fullscreen-player__tabs__item" :class="{active: item.flag}" v-for="(item, index) in showOptions" :key="item.name" :data-index="index">
-            {{item.name}}
+      <div class="c-fullscreen-player__scroll">
+        <div v-if="showOptions[0].flag" class="c-fullscreen-player__lyric" v-scroll ref="lyricRef">
+          <div class="c-fullscreen-player__lyric__wrapper">
+            <div class="c-fullscreen-player__lyric__item"
+            :class="{active: index == currentRow}"
+            ref="lyricItem"
+            :key="item.time"
+            v-for="(item, index) in lyricArr">{{item.text}}</div>
           </div>
+        </div>
+        <div v-else  class="c-fullscreen-player__mv">mv</div>
+      </div>
+    </div>
+    <div class="c-fullscreen-player__tabs" @click="switchTabs">
+      <div class="c-fullscreen-player__tabs__wrapper">
+        <div class="c-fullscreen-player__tabs__item" :class="{active: item.flag}" v-for="(item, index) in showOptions" :key="item.name" :data-index="index">
+          {{item.name}}
         </div>
       </div>
     </div>
@@ -16,8 +28,9 @@
 </template>
 
 <script type="text/javascript">
-import {ref, computed} from "vue";
+import {ref, computed, onBeforeUnmount} from "vue";
 import {useStore} from "vuex";
+import {parseLyric} from "@/utils/utils.js";
 export default {
   setup(props, context) {
     let showOptions = ref([
@@ -28,6 +41,28 @@ export default {
     let lyricDetail = computed(() => store.state.player.currentPlayLyric);
     let mvDetail = computed(() => store.state.player.currentPlayMv);
     let songDetail = computed(() => store.state.player.currentPlayDetail);
+    let lyricArr = ref(parseLyric(lyricDetail.value.lyric));
+    let lyricRef = ref(null);
+    let lyricItem = ref(null);
+    // 用来记录当前正在第几句歌词
+    let currentRow = ref(0);
+    // 获取全局唯一的audio元素
+    let audio = document.getElementById("audio");
+    // 计算当前是第几行
+    let calcCurrentRow = function() {
+      for(let i = 0; i < lyricArr.value.length; i++) {
+        let {currentTime} = audio;
+        if(i == (lyricArr.value.length - 1)) {
+          currentRow.value = i;
+          break;
+        }
+        if(lyricArr.value[i].time <= currentTime && lyricArr.value[i+1].time >= currentTime) {
+          currentRow.value = i;
+          break;
+        }
+      }
+    };
+    calcCurrentRow();
 
     let switchTabs = function(e) {
       let index = e?.target?.dataset?.index;
@@ -40,12 +75,42 @@ export default {
       }
       showOptions.value[index].flag = true;
     }
+
+    // 歌曲播放进度变化事件回调
+    let onTimeupdate = function(e) {
+      let {currentTime, duration} = audio;
+      console.log(lyricItem.value.innerText);
+      console.log(currentRow.value);
+      if(currentRow.value >= lyricArr.value.length - 2) {
+        currentRow.value = currentTime == duration ? 0 : currentRow.value;
+        return;
+      }
+      if(currentTime >= lyricArr.value[currentRow.value+1].time && currentTime <= lyricArr.value[currentRow.value+2].time) {
+        currentRow.value += 1;
+        lyricRef.value.scrollTop = currentRow.value * lyricItem.value.clientHeight;
+      } else if(currentTime >= lyricArr.value[currentRow.value].time && currentTime < lyricArr.value[currentRow.value+1].time) {
+        return;
+      } else {
+        calcCurrentRow();
+      }
+    }
+    audio.addEventListener("timeupdate", onTimeupdate);
+
+    // 组件销毁时回收资源
+    onBeforeUnmount(() => {
+      audio.removeEventListener("timeupdate", onTimeupdate);
+    });
+    
     return {
       lyricDetail,
       songDetail,
       mvDetail,
       showOptions,
-      switchTabs
+      switchTabs,
+      lyricArr,
+      lyricRef,
+      lyricItem,
+      currentRow
     }
   }
 }
@@ -77,7 +142,7 @@ export default {
     height: 100%;
     background: linear-gradient(167.96deg, rgba(255, 255, 255, 0.17) 0%, rgba(255, 255, 255, 0.03) 100%);
     box-shadow: inset -5px -5px 10px rgba(255, 255, 255, 0.1), inset 5px 5px 10px rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(50px);
+    backdrop-filter: blur(5px);
   }
   &__container {
     width: 100%;
@@ -86,7 +151,7 @@ export default {
   }
   &__tabs {
     width: 174px;
-    height: calc(100% - 60px;);
+    height: calc(100% - 60px);
     position: absolute;
     left: 0px;
     top: 0px;
@@ -121,6 +186,25 @@ export default {
       &:hover {
         background-color: rgba(255, 255, 255, 0.1);
       }
+    }
+  }
+  &__scroll {
+    height: calc(100% - 60px);
+    position: relative;
+  }
+  &__lyric {
+    height:100%;
+    overflow-y: scroll;
+    color: #FFF;
+    font-size: 16px;
+    box-sizing: border-box;
+    padding-top: 20%;
+    &__item {
+      &.active {
+        color: rgb(255, 210, 0);
+      }
+      line-height: 40px;
+      text-align: center;
     }
   }
 }

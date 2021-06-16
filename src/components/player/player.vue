@@ -98,6 +98,7 @@
     </div>
   </div>
   <audio
+  id="audio"
   ref="audio"
   :src="song.url" 
   style="display: none"

@@ -52,6 +52,7 @@ export function ScrollBar(app, options) {
     mounted(el, binding) {
       let wrapper = document.createElement("div");
       let inner = document.createElement("div");
+      el.$inner = inner;
       let startY = 0;
       let observer = null;
       inner.classList.add("v-scroll__inner");
@@ -63,6 +64,7 @@ export function ScrollBar(app, options) {
       const config = {childList: true, subtree: true};
       // 当观察到变动时执行的回调函数
       const callback = function(mutationsList, observer) {
+        console.log(1231231231)
         let {scrollHeight, clientHeight} = el;
         let scrollBarHeight = Math.floor(clientHeight / scrollHeight * clientHeight);
         const _el = el.getElementsByClassName("v-scroll__wrapper");
@@ -73,6 +75,7 @@ export function ScrollBar(app, options) {
           _el.length && el.removeChild(wrapper);
         }
       };
+      callback();
       // 创建一个观察器实例并传入回调函数
       observer = new MutationObserver(callback);
       // 以上述配置开始观察目标节点
@@ -114,7 +117,7 @@ export function ScrollBar(app, options) {
     },
     beforeUnmount(el) {
       el.removeEventListener("scroll", scrollFunc);
-      inner.removeEventListener("mousedown", mousedownFunc);
+      el.$inner.removeEventListener("mousedown", mousedownFunc);
       document.removeEventListener("mouseup", mouseupFunc);
       // 之后，可停止观察
       map.get(el).disconnect();

@@ -24,3 +24,5 @@
 // }
 // let {circleStyle, progressStyle, percent, vertical, tooltip, max} = toRefs(props);
 // console.log(circleStyle, progressStyle, percent, vertical, tooltip, max);
+// 歌词格式化正则表达式测试
+// console.log(lyricDetail.value.lyric, lyricDetail.value.lyric.split(/\[[0-9:\.]+\]/g),lyricDetail.value.lyric.match(/\[[0-9:\.]+\]/g), lyricDetail.value.lyric.split(/\cJ/g));

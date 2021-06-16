@@ -25,7 +25,7 @@
         <c-player @switchFullscreen="switchFullscreen"></c-player>
       </div>
     </div>
-    <c-fullscreen-player v-show="isFullscreen"></c-fullscreen-player>
+    <c-fullscreen-player v-if="isFullscreen"></c-fullscreen-player>
   </div>
 </div>
 </template>
@@ -52,6 +52,7 @@ export default {
     });
 
     let switchFullscreen = function(flag) {
+      console.log(flag);
       isFullscreen.value = flag;
     }
 
