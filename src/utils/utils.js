@@ -40,7 +40,7 @@ export const reduce = (style) => {
 
 // 格式化歌词
 export const parseLyric = function(lyric) {
-  console.log(lyric);
+  // console.log(lyric);
   let rowArr = lyric.split(/\cJ/g);
   let lyricArr = [];
   rowArr.forEach(row => {
@@ -49,7 +49,7 @@ export const parseLyric = function(lyric) {
     let arr = row.split("]");
     let numArr = arr[0].split(":");
     !!arr[1] && lyricArr.push({time: Number((Number(numArr[0])*60+Number(numArr[1])).toFixed(3)), text: arr[1]});
-    console.log(arr, numArr);
+    // console.log(arr, numArr);
   });
   // console.log(lyricObj);
   return lyricArr;

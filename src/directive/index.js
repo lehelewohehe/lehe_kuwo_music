@@ -42,10 +42,6 @@ export function JumpAnchor(app, options) {
 
 // 自定义滚动条
 export function ScrollBar(app, options) {
-  let scrollFunc = null;
-  let mousemoveFunc = null;
-  let mousedownFunc = null;
-  let mouseupFunc = null;
   let map = new WeakMap();
   // 注册一个全局指令v-scroll 用于自定义滚动条
   app.directive("scroll", {
@@ -53,6 +49,10 @@ export function ScrollBar(app, options) {
       let wrapper = document.createElement("div");
       let inner = document.createElement("div");
       el.$inner = inner;
+      let scrollFunc = null;
+      let mousemoveFunc = null;
+      let mousedownFunc = null;
+      let mouseupFunc = null;
       let startY = 0;
       let observer = null;
       inner.classList.add("v-scroll__inner");
@@ -83,12 +83,12 @@ export function ScrollBar(app, options) {
       map.set(el, observer);
 
       // 滚动事件绑定的回调，节流
-      scrollFunc = throttle(function() {
+      el.$scrollFunc = scrollFunc = throttle(function() {
         let {scrollTop, scrollHeight, clientHeight} = el;
         inner.style.top = scrollTop / scrollHeight * clientHeight + "px";
       }, 30);
       // 鼠标移动事件绑定的回调，节流
-      mousemoveFunc = throttle(function(e) {
+      el.$mousemoveFunc = mousemoveFunc = throttle(function(e) {
         let {clientHeight, scrollHeight} = el;
         let max = clientHeight - inner.clientHeight;
         let currentTop = inner.style.top ? parseInt(inner.style.top) : 0;
@@ -100,13 +100,13 @@ export function ScrollBar(app, options) {
         el.scrollTop = Math.ceil(top / max * (scrollHeight - clientHeight));
       }, 30);
       // 鼠标按下事件的回调
-      mousedownFunc = function(e) {
+      el.$mousedownFunc = mousedownFunc = function(e) {
         startY = e.pageY;
         el.removeEventListener("scroll", scrollFunc);
         document.addEventListener("mousemove", mousemoveFunc);
       };
       // 鼠标抬起事件的回调
-      mouseupFunc = function(e) {
+      el.$mouseupFunc = mouseupFunc = function(e) {
         el.addEventListener("scroll", scrollFunc);
         document.removeEventListener("mousemove", mousemoveFunc);
         startY = 0;
@@ -116,9 +116,9 @@ export function ScrollBar(app, options) {
       document.addEventListener("mouseup", mouseupFunc);
     },
     beforeUnmount(el) {
-      el.removeEventListener("scroll", scrollFunc);
-      el.$inner.removeEventListener("mousedown", mousedownFunc);
-      document.removeEventListener("mouseup", mouseupFunc);
+      el.removeEventListener("scroll", el.$scrollFunc);
+      el.$inner.removeEventListener("mousedown", el.$mousedownFunc);
+      document.removeEventListener("mouseup", el.$mouseupFunc);
       // 之后，可停止观察
       map.get(el).disconnect();
     }

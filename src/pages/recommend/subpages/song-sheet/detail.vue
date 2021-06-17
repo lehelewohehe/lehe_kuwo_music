@@ -47,7 +47,10 @@
           prop="name"
           label="歌名">
             <template #default="scope">
-              <div @click="setCurrentPlaySong(scope.row)" class="text-ellipsis active-hover">{{scope.row.name}}</div>
+              <div class="text-ellipsis flex flex-item-center">
+                <span class="active-hover" @click="setCurrentPlaySong(scope.row)">{{scope.row.name}}</span>
+                <i class="iconMV iconfont ml5 active-hover" style="color: #ffd200;" v-if="!!scope.row.mv"></i>
+              </div>
             </template>
           </el-table-column>
           <el-table-column width="200">

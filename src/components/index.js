@@ -13,7 +13,8 @@ import CUserBox from "@/components/user-box/user-box.vue";
 import CSwiper from "@/components/swiper/swiper.vue";
 import CGoodsBox from "@/components/goods-box/goods-box.vue";
 import CButton from "@/components/button/button.vue";
-import CFullscreenPlayer from "../components/fullscreen-player/fullscreen-player.vue";
+import CFullscreenPlayer from "@/components/fullscreen-player/fullscreen-player.vue";
+import CVideo from "@/components/video/video.vue";
 
 const infos = [
   {name: "c-avatar", component: CAvatar},
@@ -31,6 +32,7 @@ const infos = [
   {name: "c-goods-box", component: CGoodsBox},
   {name: "c-button", component: CButton},
   {name: "c-fullscreen-player", component: CFullscreenPlayer},
+  {name: "c-video", component: CVideo},
 ]
 export default function(app, options) {
   infos.forEach((item) => {

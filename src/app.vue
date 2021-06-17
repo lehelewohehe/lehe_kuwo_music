@@ -52,7 +52,6 @@ export default {
     });
 
     let switchFullscreen = function(flag) {
-      console.log(flag);
       isFullscreen.value = flag;
     }
 

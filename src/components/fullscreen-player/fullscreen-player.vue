@@ -1,9 +1,9 @@
 <template>
-<div class="c-fullscreen-player">
+<div class="c-fullscreen-player" :style="{'z-index': showOptions[1].flag?20000:''}">
   <div class="c-fullscreen-player__wrapper" :style="{'background-image': `url(${songDetail?.al?.picUrl})`}">
     <div class="c-fullscreen-player__mask"></div>
     <div class="c-fullscreen-player__container">
-      <div class="c-fullscreen-player__scroll">
+      <div class="c-fullscreen-player__scroll" :style="{'height': showOptions[1].flag?'100%':''}">
         <div v-if="showOptions[0].flag" class="c-fullscreen-player__lyric" v-scroll ref="lyricRef">
           <div class="c-fullscreen-player__lyric__wrapper">
             <div class="c-fullscreen-player__lyric__item"
@@ -13,7 +13,10 @@
             v-for="(item, index) in lyricArr">{{item.text}}</div>
           </div>
         </div>
-        <div v-else  class="c-fullscreen-player__mv">mv</div>
+        <div v-else class="c-fullscreen-player__mv">
+          <c-video :src="mvDetail.url"></c-video>
+          <i class="iconfont iconguanbi pointer" @click="switchTabs(0)" style="font-size: 30px;position: absolute;top: 10px;right: 10px;"></i>
+        </div>
       </div>
     </div>
     <div class="c-fullscreen-player__tabs" @click="switchTabs">
@@ -31,6 +34,7 @@
 import {ref, computed, onUnmounted, nextTick} from "vue";
 import {useStore} from "vuex";
 import {parseLyric} from "@/utils/utils.js";
+import {toast} from "@/components/hook.js";
 export default {
   setup(props, context) {
     let showOptions = ref([
@@ -48,6 +52,7 @@ export default {
     let currentRow = ref(0);
     // 获取全局唯一的audio元素
     let audio = document.getElementById("audio");
+    console.log(mvDetail.value);
     // 计算当前是第几行
     let calcCurrentRow = function() {
       let {currentTime} = audio;
@@ -71,23 +76,38 @@ export default {
     };
     calcCurrentRow();
 
-    let switchTabs = function(e) {
-      let index = e?.target?.dataset?.index;
-      if(index == undefined) return;
-      for(let item of showOptions.value) {
-        if(item.flag) {
-          item.flag = false;
-          break;
+    let switchTabs = (function() {
+      let paused = audio.paused;
+      return function(e) {
+        let index = typeof e == "object" ? e?.target?.dataset?.index : e;
+        if(index == undefined) return;
+        if(index == 1 && !mvDetail.value.url) {
+          return toast({
+            message: "暂无MV!",
+            icon: "iconzhuyi"
+          });
+        }
+        paused = index == 1 ? audio.paused : paused;
+        for(let item of showOptions.value) {
+          if(item.flag) {
+            item.flag = false;
+            break;
+          }
+        }
+        showOptions.value[index].flag = true;
+        if(index == 0) {
+          !paused && audio.play();
+          calcCurrentRow();
+        } else {
+          audio.pause();
         }
       }
-      showOptions.value[index].flag = true;
-    }
-    console.log(lyricArr.value);
+    })();
     // 歌曲播放进度变化事件回调
     let onTimeupdate = function(e) {
       let {currentTime, duration} = audio;
       // console.log(lyricItem.value.innerText);
-      console.log(currentRow.value, currentTime);
+      // console.log(currentRow.value, currentTime);
       let cur = lyricArr.value[currentRow.value]?.time;
       let next = lyricArr.value[currentRow.value+1]?.time;
       let nnext = lyricArr.value[currentRow.value+2]?.time;
@@ -199,6 +219,10 @@ export default {
   }
   &__scroll {
     height: calc(100% - 60px);
+    position: relative;
+  }
+  &__mv {
+    height: 100%;
     position: relative;
   }
   &__lyric {

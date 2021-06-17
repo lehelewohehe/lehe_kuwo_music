@@ -35,9 +35,9 @@ export default {
       }).catch(error => {
         console.log(error);
       })
-      !!mv && getSongMV(mv).then(res => {
+      !!mv ? getSongMV(mv).then(res => {
         commit({type: "setCurrentPlayMV", currentPlayMv: res.data});
-      })
+      }) : commit({type: "setCurrentPlayMV", currentPlayMv: {}});
       getSongLyric(id).then(res => {
         commit({type: "setCurrentPlayLyric", currentPlayLyric: res.lrc});
       })
