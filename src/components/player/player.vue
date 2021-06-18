@@ -91,7 +91,7 @@
       :class="`${isCollect ? 'iconshoucang' : 'iconicon_collect'}`"></i>
     </div>
     <div class="c-player__download flex-center">
-      <i class="iconfont iconxiazai"></i>
+      <i class="iconfont iconxiazai" @click="download"></i>
     </div>
     <div class="c-player__playlist flex-center">
       <i class="iconfont icongedan"></i>
@@ -116,6 +116,8 @@
 import {toast} from "@/components/hook.js";
 import {ref, computed, getCurrentInstance, watch} from "vue";
 import {useStore} from "vuex";
+import {toggleSongIsCollect} from "@/request/index.js";
+import {downloadFile} from "@/utils/utils.js";
 export default {
   setup(props, context) {
     let {emit} = context;
@@ -163,13 +165,14 @@ export default {
 
     // 用于本地切换歌曲是否被收藏状态
     let onChangeCollect = function() {
-      isCollect.value = !isCollect.value;
-      if(isCollect.value) {
-        toast({
+      console.log(songDetail.value, 1234);
+      toggleSongIsCollect({id:songDetail.value.id, like: !isCollect.value}).then(res => {
+        isCollect.value = !isCollect.value;
+        isCollect.value && toast({
           message: "成功加入歌曲至'我的收藏'!",
           icon: "iconzhuyi"
         });
-      }
+      });
     }
     // 切换模式选项盒子
     let onChangeMode = function() {
@@ -252,6 +255,12 @@ export default {
       audio.value.volume = voicePercent.value / 100;
     });
 
+    // 下载音乐文件
+    let download = function() {
+      if(!song.value.url) return;
+      downloadFile(song.value.url, `${songDetail.value.name}.mp3`, "get");
+    }
+
     return {
       allTime,
       signerPercent,
@@ -278,7 +287,8 @@ export default {
       onTimeupdate,
       onDurationchange,
       switchPlayStatus,
-      switchFullscreen
+      switchFullscreen,
+      download
     }
   }
 }

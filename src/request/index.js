@@ -137,3 +137,8 @@ export function getSongLyric(id) {
 export function getSongMV(id) {
   return axios.get(`/mv/url?id=${id}`);
 }
+
+// 添加/取消收藏
+export function toggleSongIsCollect(data) {
+  return axios.post(`/like`, data);
+}
